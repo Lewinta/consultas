@@ -13,24 +13,24 @@ app_license = "MIT"
 
 #website
 app_include_js = [
-        "assets/js/libs.min.js",
-        "assets/js/desk.min.js",
-        "assets/js/editor.min.js",
-        "assets/js/list.min.js",
-        "assets/js/form.min.js",
-        "assets/js/report.min.js",
-        "assets/js/d3.min.js",
-        "assets/js/jquery.mask.js",
-        "assets/js/user_functions.js",
-        "assets/frappe/js/frappe/toolbar.js"
+"assets/js/user_functions.js"
+#        "assets/js/libs.min.js",
+#        "assets/js/desk.min.js",
+#        "assets/js/editor.min.js",
+#        "assets/js/list.min.js",
+#        "assets/js/form.min.js",
+#        "assets/js/report.min.js",
+#        "assets/js/d3.min.js",
+#        #"assets/js/user_functions.js",
+#        "assets/frappe/js/frappe/toolbar.js"
 ]
-app_include_css = [
-        "assets/css/desk.min.css",
-        "assets/css/list.min.css",
-        "assets/css/form.min.css",
-        "assets/css/report.min.css",
-        "assets/css/module.min.css"
-]
+#app_include_css = [
+#        "assets/css/desk.min.css",
+#        "assets/css/list.min.css",
+#        "assets/css/form.min.css",
+#        "assets/css/report.min.css",
+#        "assets/css/module.min.css"
+#]
 
 
 
