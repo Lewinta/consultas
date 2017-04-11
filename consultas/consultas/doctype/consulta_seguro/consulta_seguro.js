@@ -4,16 +4,7 @@ frappe.ui.form.on('Consulta Seguro',
 {
     refresh: function(frm)
     {
-		if(frm.doc.verificado)
-		{
-			var df = frappe.meta.get_docfield("Consulta Prueba","prueba", frm.doc.name);
-			df.read_only = 1;
-			var df = frappe.meta.get_docfield("Consulta Prueba","autorizado", frm.doc.name);
-			df.read_only = 1;
-			var df = frappe.meta.get_docfield("Consulta Prueba","diferencia", frm.doc.name);
-			df.read_only = 1; 
-			
-		}
+		
         if (!frm.doc.__islocal) return;
         frappe.model.set_value(frm.doctype, frm.docname, "fecha", new Date());
         var callback = function(data)
@@ -51,10 +42,15 @@ frappe.ui.form.on('Consulta Seguro',
     validate: function(frm)
     {
         frappe.model.set_value(frm.doctype, frm.docname, "responsable", frappe.session.user);
-		
-		if (frm.doc.verificado) {
-            //if (!frm.doc.__islocal) return;
-
+    },
+	before_submit:function(frm)
+	{
+			if (!frm.doc.autorizacion)
+			{	
+				frappe.throw("Debes agregar el numero de autorizacion antes de guardar el documento");
+				validated=false;
+				return ;
+			}	
             var callback = function(data) {
                 //console.log(data);
                 return;
@@ -76,8 +72,7 @@ frappe.ui.form.on('Consulta Seguro',
 					frappe.show_alert("Se ha agregado una Prueba nueva a la lista de Precio de " + frm.doc.ars,15);
 				}
 			});
-        }
-    },
+	},
     ars: function(frm)
     {
         frappe.call(
