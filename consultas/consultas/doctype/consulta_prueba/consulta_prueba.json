@@ -8,7 +8,7 @@
  "custom": 0, 
  "docstatus": 0, 
  "doctype": "DocType", 
- "document_type": "", 
+ "document_type": "System", 
  "editable_grid": 1, 
  "engine": "InnoDB", 
  "fields": [
@@ -175,7 +175,7 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2017-04-09 20:53:25.589778", 
+ "modified": "2017-04-21 23:52:37.479247", 
  "modified_by": "Administrator", 
  "module": "Consultas", 
  "name": "Consulta Prueba", 

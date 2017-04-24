@@ -12,11 +12,40 @@ frappe.ui.form.on('Consulta Privada', {
     },
     medico: function(frm, cdt, cdn) {
         var tDiferencia = 0;
-        if (!frm.doc.pruebas||!frm.doc.medico) return;
-		
+		var med=frm.doc.medico;
+		if (!frm.doc.es_referido|| !frm.doc.medico) med="none";
+        
+		if (frm.doc.es_referido) {
+			
+			frm.doc.pruebas.forEach(function(child) {
+
+				frappe.model.get_value("Lista Precio", {ars_medico: med,prueba: child.prueba}, "monto", function(data) {
+					
+					if (data) {
+						
+						child.diferencia=data.monto;
+						refresh_field("pruebas");
+					} 
+					else {
+						frappe.model.get_value("Prueba", child.prueba, "precio", function(dftl) {
+					   
+							child.diferencia=dftl.precio;
+							refresh_field("pruebas");
+						});
+					}
+					
+				});
+			});
+		}
+    },
+	es_referido:function(frm, cdt, cdn) {
+        var tDiferencia = 0;
+		var med=frm.doc.medico;
+        //if (!frm.doc.pruebas||!frm.doc.medico) return;
+		if (!frm.doc.es_referido|| !frm.doc.medico) med="none";
         frm.doc.pruebas.forEach(function(child) {
 
-            frappe.model.get_value("Lista Precio", {ars_medico: frm.doc.medico,prueba: child.prueba}, "monto", function(data) {
+            frappe.model.get_value("Lista Precio", {ars_medico: med,prueba: child.prueba}, "monto", function(data) {
 				
                 if (data) {
                     
@@ -38,36 +67,35 @@ frappe.ui.form.on('Consulta Privada', {
     validate: function(frm, cdt, cdn) {
         frappe.model.set_value(frm.doctype, frm.docname, "responsable", frappe.session.user);
 
-        if (frm.doc.verificado) {
-            if (!frm.doc.__islocal) return;
-            console.log("returned");
-
-            var callback = function(data) {
-               // console.log(data);
-                return;
-            }
-
-            if (frm.doc.es_referido) {
-                frm.doc.pruebas.forEach(function(child) {
-
-                    frappe.model.get_value("Lista Precio", {
-                            prueba: child.prueba,
-                            ars_medico: frm.doc.medico
-                        },
-                        "monto",
-                        callback);
-                });
-				
-				console.log("runserverobj");
-				$c('runserverobj', {"method": "guardar_lista_de_precio", "docs": cur_frm.doc}, function(response){
-					if(response.message){
-						frappe.show_alert("Se ha agregado una Prueba nueva a la lista de Precio  " + frm.doc.medico,15);
-					}
-				});
-            }
-
-        }
+        
+		
     },
+	before_submit:function(frm){
+		
+		var callback = function(data) {
+		   // console.log(data);
+			return;
+		}
+
+		if (frm.doc.es_referido) {
+			frm.doc.pruebas.forEach(function(child) {
+
+				frappe.model.get_value("Lista Precio", {
+						prueba: child.prueba,
+						ars_medico: frm.doc.medico
+					},
+					"monto",
+					callback);
+			});
+			
+			console.log("runserverobj");
+			$c('runserverobj', {"method": "guardar_lista_de_precio", "docs": cur_frm.doc}, function(response){
+				if(response.message){
+					frappe.show_alert("Se ha agregado una Prueba nueva a la lista de Precio  " + frm.doc.medico,15);
+				}
+			});
+		}
+	}
 });
 frappe.ui.form.on("Consulta Prueba Privada", {
     prueba: function(frm, cdt, cdn) {
@@ -90,9 +118,11 @@ frappe.ui.form.on("Consulta Prueba Privada", {
                 frappe.model.set_value(frm.doctype, frm.docname, "diferencia", tDiferencia);
             });
         }
-
-        if (row.prueba) frappe.model.get_value("Lista Precio", {ars_medico: frm.doc.medico,prueba: row.prueba},"monto", busca_precio);
-
+		var med=frm.doc.medico;
+		if (frm.doc.es_referido|| !frm.doc.medico) med="none";
+		
+        if (row.prueba) frappe.model.get_value("Lista Precio", {ars_medico: med,prueba: row.prueba},"monto", busca_precio);
+		else frm.get_field("pruebas").grid.grid_rows[row.idx-1].remove();
     },
     diferencia: function(frm, cdt, cdn) {
         var tDiferencia = 0;

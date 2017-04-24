@@ -29,8 +29,8 @@ class ConsultaPrivada(Document):
 				})
 				
 				doc.insert()
-				#frappe.msgprint("Se ha agregado una Prueba nueva a la lista de {0}".format(self.medico))
 				self.new_inserted = True
+				#frappe.msgprint("Se ha agregado una Prueba nueva a la lista de {0}".format(self.medico))
 				
 		return self.new_inserted
 		

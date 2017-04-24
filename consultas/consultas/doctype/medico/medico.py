@@ -7,4 +7,6 @@ import frappe
 from frappe.model.document import Document
 
 class Medico(Document):
-	pass
+	def after_update(self):
+		self.name=self.nombre_completo
+	

@@ -8,7 +8,7 @@
  "custom": 0, 
  "docstatus": 0, 
  "doctype": "DocType", 
- "document_type": "", 
+ "document_type": "System", 
  "editable_grid": 1, 
  "engine": "InnoDB", 
  "fields": [
@@ -112,7 +112,7 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2017-04-08 04:47:50.869714", 
+ "modified": "2017-04-21 23:53:12.030904", 
  "modified_by": "Administrator", 
  "module": "Consultas", 
  "name": "Consulta Prueba Privada", 

@@ -66,8 +66,7 @@ frappe.ui.form.on('Consulta Seguro',
 					callback);
 			});
 			
-			console.log("runserverobj");
-			$c('runserverobj', {"method": "guardar_lista_de_precio", "docs": cur_frm.doc}, function(response){
+			$c('runserverobj', {"method": "guardar_lista_de_precio", "docs": frm.doc}, function(response){
 				if(response.message){
 					frappe.show_alert("Se ha agregado una Prueba nueva a la lista de Precio de " + frm.doc.ars,15);
 				}
@@ -81,7 +80,7 @@ frappe.ui.form.on('Consulta Seguro',
             args:
             {
                 doctype: "ARS",
-                name: cur_frm.doc.ars
+                name: frm.doc.ars
             },
             callback:function(data)
             {
