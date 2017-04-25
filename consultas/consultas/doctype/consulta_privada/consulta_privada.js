@@ -13,7 +13,7 @@ frappe.ui.form.on('Consulta Privada', {
     medico: function(frm, cdt, cdn) {
         var tDiferencia = 0;
 		var med=frm.doc.medico;
-		if (!frm.doc.es_referido|| !frm.doc.medico) med="none";
+		if ( !frm.doc.medico) med="none";
         
 		if (frm.doc.es_referido) {
 			
@@ -42,28 +42,30 @@ frappe.ui.form.on('Consulta Privada', {
         var tDiferencia = 0;
 		var med=frm.doc.medico;
         //if (!frm.doc.pruebas||!frm.doc.medico) return;
-		if (!frm.doc.es_referido|| !frm.doc.medico) med="none";
-        frm.doc.pruebas.forEach(function(child) {
-
-            frappe.model.get_value("Lista Precio", {ars_medico: med,prueba: child.prueba}, "monto", function(data) {
+		if (!frm.doc.medico) med="none";
+		if(frm.doc.pruebas)
+		{	
+			frm.doc.pruebas.forEach(function(child) {
 				
-                if (data) {
-                    
-					child.diferencia=data.monto;
-					refresh_field("pruebas");
-                } 
-				else {
-                    frappe.model.get_value("Prueba", child.prueba, "precio", function(dftl) {
-                   
-						child.diferencia=dftl.precio;
+				frappe.model.get_value("Lista Precio", {ars_medico: med,prueba: child.prueba}, "monto", function(data) {
+					
+					if (data && frm.doc.es_referido) {
+						
+						child.diferencia=data.monto;
 						refresh_field("pruebas");
-                    });
-                }
-				
-            });
-        });
-		
-    },
+					} 
+					else {
+						frappe.model.get_value("Prueba", child.prueba, "precio", function(dftl) {
+					   
+							child.diferencia=dftl.precio;
+							refresh_field("pruebas");
+						});
+					}
+					
+				});
+			});
+		}
+	},
     validate: function(frm, cdt, cdn) {
         frappe.model.set_value(frm.doctype, frm.docname, "responsable", frappe.session.user);
 
@@ -104,7 +106,7 @@ frappe.ui.form.on("Consulta Prueba Privada", {
 		var row = locals[cdt][cdn];
 		
         var busca_precio = function(data) {
-            if (data) //El precio esta en la lista de precios del medico o ARS
+            if (data && frm.doc.es_referido) //El precio esta en la lista de precios del medico o ARS
             {
                 frappe.model.set_value(cdt, cdn, "diferencia", data.monto);
             } else //Tomamos el precio por defecto
@@ -119,7 +121,7 @@ frappe.ui.form.on("Consulta Prueba Privada", {
             });
         }
 		var med=frm.doc.medico;
-		if (frm.doc.es_referido|| !frm.doc.medico) med="none";
+		if (!frm.doc.medico) med="none";
 		
         if (row.prueba) frappe.model.get_value("Lista Precio", {ars_medico: med,prueba: row.prueba},"monto", busca_precio);
 		else frm.get_field("pruebas").grid.grid_rows[row.idx-1].remove();

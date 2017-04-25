@@ -72,11 +72,11 @@ frappe.ui.form.on('Consulta Privada', {
 frappe.ui.form.on("Consulta Prueba Privada", {
     prueba: function(frm, cdt, cdn) {
         var tDiferencia = 0;
+		console.log("Medico: "+frm.doc.medico+"\nPrueba: "+row.prueba);
         
 		var row = locals[cdt][cdn];
-		
         var busca_precio = function(data) {
-            if (data) //El precio esta en la lista de precios del medico o ARS
+            if (data && frm.doc.es_referido) //El precio esta en la lista de precios del medico o ARS
             {
                 frappe.model.set_value(cdt, cdn, "diferencia", data.monto);
             } else //Tomamos el precio por defecto
@@ -90,14 +90,14 @@ frappe.ui.form.on("Consulta Prueba Privada", {
                 frappe.model.set_value(frm.doctype, frm.docname, "diferencia", tDiferencia);
             });
         }
-
+			
         if (row.prueba) frappe.model.get_value("Lista Precio", {ars_medico: frm.doc.medico,prueba: row.prueba},"monto", busca_precio);
 
     },
     diferencia: function(frm, cdt, cdn) {
         var tDiferencia = 0;
         var row = locals[cdt][cdn];
-
+console.log("Medico: "+frm.doc.medico+"\nPrueba: "+row.prueba);
         frm.doc.pruebas.forEach(function(child) {
             tDiferencia += child.diferencia;
             frappe.model.set_value(frm.doctype, frm.docname, "diferencia", tDiferencia);

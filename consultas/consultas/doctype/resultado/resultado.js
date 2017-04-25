@@ -4,13 +4,14 @@
 frappe.ui.form.on('Resultado', {
 	onload: function(frm){
 		setTimeout(function(){
-			$(".btn.btn-xs.btn-default.grid-add-row").hide();
+			$("div[data-page-route='Form/Resultado'] .btn.btn-xs.btn-default.grid-add-row").hide();
 		}, 500);
 	},	
 	consulta: function(frm){
-		frappe.dom.freeze("Espere...");
+		
 		if(frm.doc.consulta)
 		{
+			
 			frappe.call({"method": "frappe.client.get",
 				args: {
 					doctype: "Paciente",
@@ -23,19 +24,21 @@ frappe.ui.form.on('Resultado', {
 					frappe.model.set_value(frm.doctype,frm.docname,"direccion",data.message.direccion?data.message.direccion:"-");
 					frappe.model.set_value(frm.doctype,frm.docname,"telefono",data.message.telefono?data.message.telefono:"-");
 				*/}
+				
 			});
 			
 			$c("runserverobj",{"method": "get_list_indice_quimicos","docs":cur_frm.doc}, function(response){	
 				refresh_many(["indices_pruebas", "indices_hematologicos", "indices_urinarios","recuento_diferencial","sedimentos_urinarios","serologia","sexo","edad","cedula_pasaporte","telefono","direccion"]);
 			});
-			
-
+			frappe.dom.freeze("Espere...");
 			setTimeout(function()
 			{
 				$("div[data-fieldname='examen_fisicoquimico']").click(function(event){
 			
 					var indice =event.currentTarget.parentElement.childNodes[1].textContent;
 			
+					
+					
 					frappe.model.get_value("Indice Urinario",{"name":indice},"opciones",function(data){
 				
 						if(data)
@@ -45,13 +48,13 @@ frappe.ui.form.on('Resultado', {
 							refresh_field("indices_urinarios");
 						}	
 					});
-		
+					
 				});
 
 				$("[data-fieldname='sedimentos_urinarios'] [data-fieldname='sedimentos_urinarios'] div[data-fieldname='examen_fisicoquimico']").click(function(event){
 			
 					var indice =event.currentTarget.parentElement.childNodes[1].textContent;
-			
+					frappe.dom.freeze("Espere..."); 
 					frappe.model.get_value("Indice Urinario",{"name":indice},"opciones",function(data){
 				
 						if(data)
@@ -61,14 +64,15 @@ frappe.ui.form.on('Resultado', {
 							refresh_field("sedimentos_urinarios");
 						}	
 					});
+				
 		
 				});
-				
+				frappe.dom.unfreeze();
 
-			}, 500);
+			}, 2000);
 
 		}
-		frappe.dom.unfreeze();
+		
 	}
 	
 });
