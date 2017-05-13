@@ -1,13 +1,16 @@
 // Copyright (c) 2016, Lewin Villar and contributors
 // For license information, please see license.txt
 frappe.ui.form.on('Consulta Privada', {
-    refresh: function(frm) {
+    onload: function(frm) {
         if (!frm.doc.__islocal) return;
         frappe.model.set_value(frm.doctype, frm.docname, "fecha", new Date());
         var callback = function(data) {
-            frappe.model.set_value(frm.doctype, frm.docname, "creado_en_sucursal", data.empresa);
+			
+			frappe.model.get_value("Empresa",data.empresa, "nombre", function (data){
+				frappe.model.set_value(frm.doctype, frm.docname, "empresa", data.nombre);				
+				console.log(data.nombre);
+			});			
         };
-
         frappe.model.get_value("User", frappe.session.user, "empresa", callback);
     },
     medico: function(frm, cdt, cdn) {

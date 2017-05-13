@@ -1,9 +1,10 @@
-// Copyright (c) 2016, Lewin Villar and contributors
+/* Copyright (c) 2016, Lewin Villar and contributors
 // For license information, please see license.txt
 
 frappe.ui.form.on('Paciente', {
 	refresh: function(frm) {
 		frappe.model.set_value(frm.doctype,frm.docname,"responsable",frappe.session.user);	
+		console.log("uno");
 	},
 	telefono:function(frm){
         frappe.model.set_value(frm.doctype,frm.docname, "telefono",mask_phone(frm.doc.telefono));
@@ -46,8 +47,6 @@ function mask_phone(phone)
                 return phone;
         else if(pattern2.test(phone))
                 return ("{0}{1}{2}{3}{4} {5}{6}{7}{8}{9}{10}{11}{12}".format(phone));
-
-
 }
-
+*/
 

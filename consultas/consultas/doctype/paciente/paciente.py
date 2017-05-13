@@ -16,3 +16,15 @@ class Paciente(Document):
 		#doc.save()
 		self.name=self.nombre_completo
 		#print(self.name)
+@frappe.whitelist()
+def make_consulta_privada(source_name, target_doc = None):
+	doclist = get_mapped_doc("Paciente", source_name, {
+		"Paciente": {
+			"doctype": "Consulta Privada",
+			"validation": {
+				"docstatus": ["=", 0]
+			}
+		}
+	}, target_doc)
+
+	return doclist

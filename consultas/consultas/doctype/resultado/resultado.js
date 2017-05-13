@@ -5,7 +5,65 @@ frappe.ui.form.on('Resultado', {
 	onload: function(frm){
 		setTimeout(function(){
 			$("div[data-page-route='Form/Resultado'] .btn.btn-xs.btn-default.grid-add-row").hide();
-		}, 500);
+		
+			if(frm.doc.indices_urinarios)
+			{
+				$("div[data-fieldname='examen_fisicoquimico']").click(function(event){
+			
+					var indice =event.currentTarget.parentElement.childNodes[1].textContent;
+					
+					frappe.model.get_value("Indice Urinario",{"name":indice},"opciones",function(data){
+				
+						if(data)
+						{
+							frm.set_df_property("examen_fisicoquimico","options",data.opciones,frm.docname,"indices_urinarios");
+							
+							refresh_field("indices_urinarios");
+						}	
+					});
+				});
+				//remove eventsbefore adding it
+				//$("[data-fieldname='sedimentos_urinarios'] [data-fieldname='sedimentos_urinarios'] div[data-fieldname='examen_fisicoquimico']").off("click");
+
+				$("[data-fieldname='sedimentos_urinarios'] [data-fieldname='sedimentos_urinarios'] div[data-fieldname='examen_fisicoquimico']").click(function(event){
+			
+					var indice =event.currentTarget.parentElement.childNodes[1].textContent;
+					
+					frappe.model.get_value("Indice Urinario",{"name":indice},"opciones",function(data){
+				
+						if(data)
+						{
+							frm.set_df_property("examen_fisicoquimico","options",data.opciones,frm.docname,"sedimentos_urinarios");
+							
+							refresh_field("sedimentos_urinarios");
+						}	
+					});
+				});
+			}
+		}, 500);		
+	},
+	refresh:function(frm){
+		var tipoResultado = frm.doc.consulta_tipo=="Consulta Privada" ? "Consulta Prueba Privada":"Consulta Prueba" 
+	
+		frappe.model.get_value(tipoResultado,{"parent":frm.doc.consulta,"prueba":"PRB-000000195"},"name",function(data){
+			if (data) {
+				frappe.model.set_value(frm.doctype,frm.docname,"test_hematologico",1)	
+			}
+			else
+			{
+				frappe.model.set_value(frm.doctype,frm.docname,"test_hematologico",0)	
+			}	
+		});
+		frappe.model.get_value(tipoResultado,{"parent":frm.doc.consulta,"prueba":"PRB-000000229"},"name",function(data){
+			if (data) {
+				frappe.model.set_value(frm.doctype,frm.docname,"test_urianalisis",1)	
+			}
+			else
+			{
+				frappe.model.set_value(frm.doctype,frm.docname,"test_urianalisis",0)	
+			}	
+		});
+		
 	},	
 	consulta: function(frm){
 		
@@ -31,6 +89,10 @@ frappe.ui.form.on('Resultado', {
 				refresh_many(["indices_pruebas", "indices_hematologicos", "indices_urinarios","recuento_diferencial","sedimentos_urinarios","serologia","sexo","edad","cedula_pasaporte","telefono","direccion"]);
 			});
 			frappe.dom.freeze("Espere...");
+			
+			//remove eventsbefore adding it
+			//$("div[data-fieldname='examen_fisicoquimico']").off("click");
+			
 			setTimeout(function()
 			{
 				$("div[data-fieldname='examen_fisicoquimico']").click(function(event){
@@ -50,11 +112,13 @@ frappe.ui.form.on('Resultado', {
 					});
 					
 				});
+				//remove eventsbefore adding it
+				//$("[data-fieldname='sedimentos_urinarios'] [data-fieldname='sedimentos_urinarios'] div[data-fieldname='examen_fisicoquimico']").off("click");
 
 				$("[data-fieldname='sedimentos_urinarios'] [data-fieldname='sedimentos_urinarios'] div[data-fieldname='examen_fisicoquimico']").click(function(event){
 			
 					var indice =event.currentTarget.parentElement.childNodes[1].textContent;
-					frappe.dom.freeze("Espere..."); 
+					
 					frappe.model.get_value("Indice Urinario",{"name":indice},"opciones",function(data){
 				
 						if(data)
@@ -67,11 +131,12 @@ frappe.ui.form.on('Resultado', {
 				
 		
 				});
-				frappe.dom.unfreeze();
+				
 
-			}, 2000);
-
+			}, 3000);
+			//setTimeout(function(){frappe.dom.unfreeze();},2000);
 		}
+			frappe.dom.unfreeze();
 		
 	}
 	
