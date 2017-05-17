@@ -1,3 +1,0 @@
-(select parent,prueba from `tabConsulta Prueba Privada` ) UNION (select parent,prueba from `tabConsulta Prueba`) ;
-
-CREATE VIEW `viewPruebas En Consulta` (parent,prueba) AS ((select parent,prueba from `tabConsulta Prueba Privada` ) UNION (select parent,prueba from `tabConsulta Prueba`) );

@@ -23,6 +23,8 @@ frappe.ui.form.on('Relacion Pacientes', {
 					$.each(response.message,function(key,value){
 						frm.add_child("consultas",{
 							"fecha":value.fecha,
+							"type":value.tipo,
+							"document":value.name,
 							"paciente":value.paciente,
 							"ars":value.ars_nombre,
 							"privado":value.privado,
