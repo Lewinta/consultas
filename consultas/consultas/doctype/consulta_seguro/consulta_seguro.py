@@ -9,9 +9,10 @@ from frappe.model.naming import make_autoname
 
 class ConsultaSeguro(Document):
 	def before_insert(self):
-                self.id=make_autoname("CLS-.##########")
+				self.id=make_autoname("CLS-.##########")
 	
 	def guardar_lista_de_precio(self):
+		self.new_inserted = False
 		for row in self.pruebas:
 			nombre_lista_precio = self.obtener_lista_de_precio(self.ars, row.prueba)
 			if nombre_lista_precio:

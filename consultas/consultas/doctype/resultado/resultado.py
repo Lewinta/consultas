@@ -7,6 +7,12 @@ import frappe
 from frappe.model.document import Document
 
 class Resultado(Document):
+	def save(self):
+		consulta = frappe.get_doc(self.consulta_tipo,self.consulta)
+		if(consulta):
+			consulta.resultado = self.name
+			consulta.save()
+
    	def get_list_indice_quimicos(self):
 		
 		paciente=frappe.get_doc("Paciente",self.paciente)

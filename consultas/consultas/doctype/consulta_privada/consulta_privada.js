@@ -42,6 +42,13 @@ frappe.ui.form.on('Consulta Privada', {
 		}
     },
 	es_referido:function(frm, cdt, cdn) {
+       
+        //Si el paciente es referido, debe existir algun medico
+        if(frm.doc.es_referido)
+        	frm.set_df_property("medico","reqd",true);
+        else
+        	frm.set_df_property("medico","reqd",false);
+
         var tDiferencia = 0;
 		var med=frm.doc.medico;
         //if (!frm.doc.pruebas||!frm.doc.medico) return;

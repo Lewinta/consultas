@@ -63,12 +63,27 @@ frappe.ui.form.on('Resultado', {
 				frappe.model.set_value(frm.doctype,frm.docname,"test_urianalisis",0)	
 			}	
 		});
+
+		cur_frm.set_query("consulta", function() {
+				return {
+					"filters": {"docstatus":1,"resultado":"0"}
+				}
+			});			
+
+	},
+	consulta_tipo: function(frm){
 		
-	},	
+			cur_frm.set_query("consulta", function() {
+				return {
+					"filters": {"docstatus":1,"resultado":"0"}
+				}
+			});	
+
+	},
 	consulta: function(frm){
 		
 		if(frm.doc.consulta)
-		{
+		{	
 			
 			frappe.call({"method": "frappe.client.get",
 				args: {

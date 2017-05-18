@@ -12,6 +12,7 @@ class ConsultaPrivada(Document):
 		self.id=make_autoname("CLP-.##########")
 
 	def guardar_lista_de_precio(self):
+		self.new_inserted = False
 		for row in self.pruebas:
 			nombre_lista_precio = self.obtener_lista_de_precio(self.medico, row.prueba)
 			if nombre_lista_precio:
