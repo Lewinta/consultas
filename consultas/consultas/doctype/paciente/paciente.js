@@ -2,6 +2,7 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('Paciente', {
+	
 	refresh: function(frm) {
 		frappe.model.set_value(frm.doctype,frm.docname,"responsable",frappe.session.user);	
 	},

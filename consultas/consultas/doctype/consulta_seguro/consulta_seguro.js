@@ -2,7 +2,7 @@
 // For license information, please see license.txt
 frappe.ui.form.on('Consulta Seguro',
 {
-    refresh: function(frm)
+    onload: function(frm)
     {
 		
         if (!frm.doc.__islocal) return;
@@ -11,12 +11,19 @@ frappe.ui.form.on('Consulta Seguro',
         {
             frappe.model.set_value(frm.doctype, frm.docname, "empresa", data.empresa);
         };
+        $('[data-fieldname="ars"]').hide();
 
         frappe.model.get_value("User", frappe.session.user, "empresa", callback);
     },
 	paciente:function(frm)
 	{
 		if (!frm.doc.pruebas||!frm.doc.ars) return;
+		frappe.model.get_value("Paciente",{"name":frm.doc.paciente},"ars",function(data){
+			if(data)
+			{	console.log(data)
+				frm.set_value("ars",data.ars)}
+		})
+		console.log("Executed");
 		
 		frm.doc.pruebas.forEach(function(child) {
 
@@ -39,9 +46,43 @@ frappe.ui.form.on('Consulta Seguro',
             });
         });
 	},
+	autorizacion: function(frm)
+	{
+		cur_frm.set_value("autorizacion",(frm.doc.autorizacion).toUpperCase());
+	},
     validate: function(frm)
     {
+        var autorizacion =" ";
         frappe.model.set_value(frm.doctype, frm.docname, "responsable", frappe.session.user);
+        if(frm.doc.autorizacion )
+        {
+        	autorizacion = (frm.doc.autorizacion.trim()).substring(0,1).toUpperCase();	 
+        	if(autorizacion != "P" && frm.doc.ars == "ARS-000004" && autorizacion.length > 0)
+        	{
+        		frappe.msgprint("Las Autorizaciones de " + frm.doc.ars_nombre + " Comienzan con 'P' verifique la ARS por favor!")
+        		console.log("4 Executed");
+        		validated = false;
+        		return false
+        	}
+        	else 
+        	{
+        		validated = true;
+        		return true;
+        	}
+
+        	if(autorizacion != "H" && frm.doc.ars == "ARS-000002" && autorizacion.length > 0)
+        	{
+        		frappe.msgprint("Las Autorizaciones de " + frm.doc.ars_nombre + " Comienzan con 'H' verifique la ARS por favor!")
+        		console.log("2 Executed");
+        		validated = false;
+        		return false
+        	}
+        	else 
+        	{
+        		validated = true;
+        		return true;
+        	}
+        }
     },
 	before_submit:function(frm)
 	{
@@ -102,9 +143,9 @@ frappe.ui.form.on("Consulta Prueba",
             
 			if (data) //El precio esta en la lista de precios del medico o ARS
             {
-                frappe.model.set_value(cdt, cdn, "autorizado", data.monto);
-				frappe.model.set_value(cdt,cdn,"diferencia",(data.monto/0.8)*0.2);
-				frappe.model.set_value(cdt,cdn,"reclamado",row.autorizado+row.diferencia);
+                frappe.model.set_value(cdt, cdn, "reclamado", data.monto);
+				frappe.model.set_value(cdt,cdn,"autorizado",data.monto * 0.8);
+				frappe.model.set_value(cdt,cdn,"diferencia",data.monto * 0.2);
 				
 				
             } else //Tomamos el precio por defecto

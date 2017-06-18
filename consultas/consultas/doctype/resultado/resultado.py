@@ -7,10 +7,14 @@ import frappe
 from frappe.model.document import Document
 
 class Resultado(Document):
-	def save(self):
+		
+	def before_insert(self):
+		result = frappe.db.sql("""SELECT CONCAT('RES-',LPAD(current+1,10,0)) as name FROM `tabSeries` WHERE name = 'RES-'""",as_dict=True)
+		name = result[0].name
+		frappe.msgprint(name)
 		consulta = frappe.get_doc(self.consulta_tipo,self.consulta)
 		if(consulta):
-			consulta.resultado = self.name
+			consulta.resultado = name
 			consulta.save()
 
    	def get_list_indice_quimicos(self):

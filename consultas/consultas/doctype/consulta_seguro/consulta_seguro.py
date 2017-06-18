@@ -10,14 +10,18 @@ from frappe.model.naming import make_autoname
 class ConsultaSeguro(Document):
 	def before_insert(self):
 				self.id=make_autoname("CLS-.##########")
-	
+	def before_cancel(self):
+		#Remove authorizations of cancelled documents to acoid diplicity
+		self.autorizacion = ""
+		self.db_update()
 	def guardar_lista_de_precio(self):
 		self.new_inserted = False
 		for row in self.pruebas:
 			nombre_lista_precio = self.obtener_lista_de_precio(self.ars, row.prueba)
 			if nombre_lista_precio:
 				doc = frappe.get_doc("Lista Precio", nombre_lista_precio)
-				doc.monto = row.diferencia
+				doc.monto = row.reclamado
+				frappe.errprint("Monto [ ${0} ]  -> Reclamado [ ${1}] ".format(doc.monto,row.reclamado))
 				doc.save()
 				
 			else:
@@ -26,7 +30,7 @@ class ConsultaSeguro(Document):
 					"prueba": row.prueba,
 					"tipo_lista": "ARS",
 					"ars_medico": self.ars,
-					"monto": row.autorizado
+					"monto": row.reclamado
 				})
 				
 				doc.insert()
