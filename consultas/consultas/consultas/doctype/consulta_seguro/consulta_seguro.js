@@ -5,6 +5,7 @@ frappe.ui.form.on('Consulta Seguro',
     refresh: function(frm)
     {
 		
+		console.log("refreshed")
         if (!frm.doc.__islocal) return;
         frappe.model.set_value(frm.doctype, frm.docname, "fecha", new Date());
         var callback = function(data)
@@ -16,12 +17,14 @@ frappe.ui.form.on('Consulta Seguro',
     },
 	paciente:function(frm)
 	{
+		console.log("paciente changed")
 		if (!frm.doc.pruebas||!frm.doc.ars) return;
+		console.log("valid")
 		
 		frm.doc.pruebas.forEach(function(child) {
 
             frappe.model.get_value("Lista Precio", {ars_medico: frm.doc.ars,prueba: child.prueba}, "monto", function(data) {
-				
+				console.log(child.nombre+" -> "+ data)
                 if (data) {
                     child.autorizado=data.monto;
                     child.diferencia=(data.monto/0.8)*0.2;

@@ -3,11 +3,24 @@
 frappe.ui.form.on('Resultado', {
 
     onload_post_render: function(frm) {
-    	var section_head = $('.section-head').find("a").filter(function(){ return $(this).text() == "Microbiologia" ;}).parent()
-        frm.set_df_property("titulo","hidden",1);
-		frm.set_df_property("antibiogramas","hidden",1);
-		console.log("section head", section_head)
-		section_head.on("click", function(){
+    	var microbiologia_sb = $('.section-head').find("a").filter(function(){ return $(this).text() == "Microbiologia" ;}).parent()
+    	var coprologico_sb = $('.section-head').find("a").filter(function(){ return $(this).text() == "Coprologico" ;}).parent()
+        var fields = ["titulo","antibiogramas", "res_coprologico" ]
+        fields.forEach(function(indice){
+			frm.set_df_property(indice,"hidden",1);
+        })
+
+		coprologico_sb.on("click", function(){
+			if(!$(this).hasClass("collapsed"))
+			{
+                frm.set_df_property("res_coprologico","hidden",0);
+			}
+			else
+			{
+                frm.set_df_property("res_coprologico","hidden",1);
+			}
+		});
+		microbiologia_sb.on("click", function(){
 			if(!$(this).hasClass("collapsed"))
 			{
                 frm.set_df_property("antibiogramas","hidden",0);
@@ -92,7 +105,23 @@ frappe.ui.form.on('Resultado', {
                 "method": "get_list_indice_quimicos",
                 "docs": frm.doc
             }, function(response) {
-                refresh_many(["indices_pruebas", "indices_hematologicos", "indices_urinarios", "recuento_diferencial", "sedimentos_urinarios", "serologia", "sexo", "edad", "cedula_pasaporte", "telefono", "direccion","antibiogramas"]);
+                refresh_many([
+                	"indices_pruebas", 
+                	"indices_hematologicos", 
+                	"indices_urinarios", 
+                	"recuento_diferencial", 
+                	"sedimentos_urinarios", 
+                	"serologia", 
+                	"sexo", 
+                	"edad", 
+                	"cedula_pasaporte", 
+                	"telefono", 
+                	"direccion",
+                	"antibiogramas",
+                	"inmunodiagnosticos",
+                    "tipificacion",
+                    "hormonas"]);
+                frm.refresh();
             });
             frappe.dom.freeze("Espere...");
             //remove eventsbefore adding it
@@ -133,12 +162,20 @@ function refresh_modules(frm) {
 
     var tipoResultado = frm.doc.consulta_tipo == "Consulta Privada" ? "Consulta Prueba Privada" : "Consulta Prueba";
 
-    frappe.model.get_value(tipoResultado, {"parent": frm.doc.consulta,"prueba": "PRB-000000195"}, "prueba_nombre", function(data) {
+    /*frappe.model.get_value(tipoResultado, {"parent": frm.doc.consulta,"prueba": "PRB-000000195"}, "prueba_nombre", function(data) {
         if (data) {
             frm.set_value("test_hematologico", 1)
         } 
         else {
             frm.set_value("test_hematologico", 0)
+        }
+    });*/
+    frappe.model.get_value(tipoResultado, {"parent": frm.doc.consulta,"prueba": "PRB-000000229"}, "prueba_nombre", function(data) {
+        if (data) {
+            frm.set_value("test_urianalisis", 1)
+        } 
+        else {
+            frm.set_value("test_urianalisis", 0)
         }
     });
     frappe.model.get_value(tipoResultado, {"parent": frm.doc.consulta,"prueba": "PRB-000000229"}, "prueba_nombre", function(data) {
@@ -148,13 +185,31 @@ function refresh_modules(frm) {
         else {
             frm.set_value("test_urianalisis", 0)
         }
-    });
-    frappe.model.get_value(tipoResultado, {"parent": frm.doc.consulta,"prueba": "PRB-000000191"}, "prueba_nombre", function(data) {
+    }); 
+    frappe.model.get_value(tipoResultado, {"parent": frm.doc.consulta,"prueba": "PRB-000000144"}, "prueba_nombre", function(data) {
         if (data) {
-            frm.set_value("test_microbiologia", 1)
+            frm.set_value("test_coprologico", 1)
         } 
         else {
-            frm.set_value("test_microbiologia", 0)
+            frm.set_value("test_coprologico", 0)
         }
     });
+   
+   /* frappe.model.get_value(tipoResultado, {"parent": frm.doc.consulta,"prueba": "PRB-000000224"}, "prueba_nombre", function(data) {
+        if (data) {
+            frm.set_value("test_inmunodiagnosticos", 1)
+        } 
+        else {
+            frm.set_value("test_inmunodiagnosticos", 0)
+        }
+    });*/
+    /*frappe.model.get_value(tipoResultado, {"parent": frm.doc.consulta,"prueba": "PRB-000000224"}, "prueba_nombre", function(data) {
+        if (data) {
+            
+            frm.set_value("test_tipificacion", 1)
+        } 
+        else {
+            frm.set_value("test_tipificacion", 0)
+        }
+    });*/
 }

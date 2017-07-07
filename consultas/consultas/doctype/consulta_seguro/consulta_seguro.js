@@ -17,34 +17,34 @@ frappe.ui.form.on('Consulta Seguro',
     },
 	paciente:function(frm)
 	{
-		if (!frm.doc.pruebas||!frm.doc.ars) return;
+
 		frappe.model.get_value("Paciente",{"name":frm.doc.paciente},"ars",function(data){
 			if(data)
-			{	console.log(data)
+			{	
 				frm.set_value("ars",data.ars)}
-		})
-		console.log("Executed");
-		
-		frm.doc.pruebas.forEach(function(child) {
+			if (frm.doc.pruebas){
+				frm.doc.pruebas.forEach(function(child) {
 
-            frappe.model.get_value("Lista Precio", {ars_medico: frm.doc.ars,prueba: child.prueba}, "monto", function(data) {
-				
-                if (data) {
-                    child.autorizado=data.monto;
-                    child.diferencia=(data.monto/0.8)*0.2;
-                    child.reclamado=child.autorizado+child.diferencia;
-					refresh_field("pruebas");
-                } 
-				else {
-                    frappe.model.get_value("Prueba", child.prueba, "precio", function(dftl) {
-						child.autorizado=dftl.precio*0.8;
-						child.diferencia=dftl.precio*0.2;
-						child.reclamado=child.autorizado+child.diferencia;
-						refresh_field("pruebas");
-                    });
-                }
-            });
-        });
+		            frappe.model.get_value("Lista Precio", {ars_medico: data.ars,prueba: child.prueba}, "monto", function(response) {
+						
+		                if (response) {
+		                    child.autorizado=response.monto * 0.8;
+		                    child.diferencia=response.monto * 0.2;
+		                    child.reclamado=child.autorizado+child.diferencia;
+							refresh_field("pruebas");
+		                } 
+						else {
+		                    frappe.model.get_value("Prueba", child.prueba, "precio", function(dftl) {
+								child.autorizado=dftl.precio*0.8;
+								child.diferencia=dftl.precio*0.2;
+								child.reclamado=child.autorizado+child.diferencia;
+								refresh_field("pruebas");
+		                    });
+		                }
+		            });
+		        });
+		    }
+	    }) 
 	},
 	autorizacion: function(frm)
 	{
