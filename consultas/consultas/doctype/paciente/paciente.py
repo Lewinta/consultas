@@ -5,6 +5,7 @@
 from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
+from frappe.model.mapper import get_mapped_doc
 from frappe.model.naming import make_autoname
 
 class Paciente(Document):
@@ -20,14 +21,14 @@ class Paciente(Document):
 	# 	self.update()
 	# 	#print(self.name)
 @frappe.whitelist()
-def make_consulta_privada(source_name, target_doc = None):
-	doclist = get_mapped_doc("Paciente", source_name, {
+def make_consulta(source_name,tipo_consulta ,target_doc = None):
+	consulta = get_mapped_doc("Paciente", source_name, {
 		"Paciente": {
-			"doctype": "Consulta Privada",
+			"doctype": tipo_consulta,
 			"validation": {
-				"docstatus": ["=", 0]
+				
 			}
 		}
 	}, target_doc)
 
-	return doclist
+	return consulta

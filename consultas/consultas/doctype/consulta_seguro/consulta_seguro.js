@@ -15,6 +15,9 @@ frappe.ui.form.on('Consulta Seguro',
 
         frappe.model.get_value("User", frappe.session.user, "empresa", callback);
     },
+    refresh: function(frm){
+    	//	frm.trigger("add_toolbar_buttons")
+    },
 	paciente:function(frm)
 	{
 
@@ -128,6 +131,46 @@ frappe.ui.form.on('Consulta Seguro',
                 frappe.model.set_value(frm.doctype, frm.docname, "ars_nombre", data.message.nombre);
             }
         });
+    },
+    hacer_resultado: function(frm){
+
+    	var method	= "consultas.consultas.doctype.consulta_seguro.consulta_seguro.make_resultado"
+    		// the args that it requires
+		var args = {
+			"source_name": frm.doc.name,
+			"tipo_consulta": frm.doctype
+		}
+
+		// callback to be executed after the server responds
+		var callback = function(response) {
+
+			// check to see if there is something back
+			if (!response.message) 
+				return 1 // exit code is 1
+
+			var doc = frappe.model.sync(response.message)
+			frappe.set_route("Form", response.message.doctype, response.message.name)
+		}
+
+		frappe.call({ "method": method, "args": args, "callback": callback })
+    },
+    add_toolbar_buttons: function(frm){
+
+		var callback = function(data){
+
+			if(data)
+		  		frappe.set_route("Form","Resultado",data.name)
+
+		  	else
+		  		frm.trigger("hacer_resultado")
+
+		} 
+		
+		var resultado = function(){
+    			frappe.model.get_value("Resultado", { "consulta": frm.doc.name }, "name", callback)
+		}
+
+    	frm.add_custom_button("Resultado",resultado	)
     }
 });
 

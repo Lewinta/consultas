@@ -4,22 +4,13 @@ frappe.ui.form.on('Resultado', {
 
     onload_post_render: function(frm) {
     	var microbiologia_sb = $('.section-head').find("a").filter(function(){ return $(this).text() == "Microbiologia" ;}).parent()
-    	var coprologico_sb = $('.section-head').find("a").filter(function(){ return $(this).text() == "Coprologico" ;}).parent()
-        var fields = ["titulo","antibiogramas", "res_coprologico" ]
+        var fields = ["titulo","antibiogramas" ]
+        var current_table
+        frm.trigger("consulta")
+
         fields.forEach(function(indice){
 			frm.set_df_property(indice,"hidden",1);
         })
-
-		coprologico_sb.on("click", function(){
-			if(!$(this).hasClass("collapsed"))
-			{
-                frm.set_df_property("res_coprologico","hidden",0);
-			}
-			else
-			{
-                frm.set_df_property("res_coprologico","hidden",1);
-			}
-		});
 		microbiologia_sb.on("click", function(){
 			if(!$(this).hasClass("collapsed"))
 			{
@@ -34,32 +25,8 @@ frappe.ui.form.on('Resultado', {
 		});
         setTimeout(function() {
             //$("div[data-page-route='Form/Resultado'] .btn.btn-xs.btn-default.grid-add-row").hide();
-            if (frm.doc.indices_urinarios) {
-                $("div[data-fieldname='examen_fisicoquimico']").click(function(event) {
-                    var indice = event.currentTarget.parentElement.childNodes[1].textContent;
-                    frappe.model.get_value("Indice Urinario", {
-                        "name": indice
-                    }, "opciones", function(data) {
-                        if (data) {
-                            frm.set_df_property("examen_fisicoquimico", "options", data.opciones, frm.docname, "indices_urinarios");
-                            refresh_field("indices_urinarios");
-                        }
-                    });
-                });
-                //remove eventsbefore adding it
-                //$("[data-fieldname='sedimentos_urinarios'] [data-fieldname='sedimentos_urinarios'] div[data-fieldname='examen_fisicoquimico']").off("click");
-                $("[data-fieldname='sedimentos_urinarios'] [data-fieldname='sedimentos_urinarios'] div[data-fieldname='examen_fisicoquimico']").click(function(event) {
-                    var indice = event.currentTarget.parentElement.childNodes[1].textContent;
-                    frappe.model.get_value("Indice Urinario", {
-                        "name": indice
-                    }, "opciones", function(data) {
-                        if (data) {
-                            frm.set_df_property("examen_fisicoquimico", "options", data.opciones, frm.docname, "sedimentos_urinarios");
-                            refresh_field("sedimentos_urinarios");
-                        }
-                    });
-                });
-            }
+            set_events(frm)
+            //}
         }, 500);
     },
     refresh: function(frm) {
@@ -83,6 +50,14 @@ frappe.ui.form.on('Resultado', {
             }
         });
     },
+   eventos: function(frm){
+    setTimeout(function() {
+            //$("div[data-page-route='Form/Resultado'] .btn.btn-xs.btn-default.grid-add-row").hide();
+            set_events(frm)
+            //}
+        }, 500);
+
+   },
     consulta: function(frm) {
         
         refresh_modules(frm);		
@@ -120,14 +95,19 @@ frappe.ui.form.on('Resultado', {
                 	"antibiogramas",
                 	"inmunodiagnosticos",
                     "tipificacion",
-                    "hormonas"]);
+                    "hormonas",
+                    "aspecto_fisico",
+                    "aspecto_microscopico"
+                    ]);
                 frm.refresh();
             });
             frappe.dom.freeze("Espere...");
             //remove eventsbefore adding it
             //$("div[data-fieldname='examen_fisicoquimico']").off("click");
             setTimeout(function() {
-                $("div[data-fieldname='examen_fisicoquimico']").click(function(event) {
+              set_events(frm)
+
+              /*  $("div[data-fieldname='examen_fisicoquimico']").click(function(event) {
                     var indice = event.currentTarget.parentElement.childNodes[1].textContent;
                     frappe.model.get_value("Indice Urinario", {
                         "name": indice
@@ -150,7 +130,7 @@ frappe.ui.form.on('Resultado', {
                             refresh_field("sedimentos_urinarios");
                         }
                     });
-                });
+                });*/
             }, 3000);
             //setTimeout(function(){frappe.dom.unfreeze();},2000);
         }
@@ -212,4 +192,43 @@ function refresh_modules(frm) {
             frm.set_value("test_tipificacion", 0)
         }
     });*/
+}
+function set_events(frm)
+{
+     $("div[data-fieldtype='Table']").mouseenter(function(event)
+            {
+                    console.log(event.currentTarget.dataset.fieldname) 
+                    current_table = event.currentTarget.dataset.fieldname
+            })
+
+
+           // if (frm.doc.indices_urinarios) {
+                $("div[data-fieldname='examen_fisicoquimico']").click(function(event) {
+                    console.log("event")
+                    var indice = event.currentTarget.parentElement.childNodes[1].textContent;
+                    frappe.model.get_value("Indice Urinario", {
+                        "name": indice
+                    }, "opciones", function(data) {
+                        if (data) {
+                            console.log("indice: "+ indice+"opciones:"+data.opciones)
+                            frm.set_df_property("examen_fisicoquimico", "options", data.opciones, frm.docname, current_table);
+                            refresh_field(current_table);
+                            
+                        }
+                    });
+                });
+                //remove eventsbefore adding it
+                //$("[data-fieldname='sedimentos_urinarios'] [data-fieldname='sedimentos_urinarios'] div[data-fieldname='examen_fisicoquimico']").off("click");
+                $("[data-fieldname='sedimentos_urinarios'] [data-fieldname='sedimentos_urinarios'] div[data-fieldname='examen_fisicoquimico']").click(function(event) {
+                    var indice = event.currentTarget.parentElement.childNodes[1].textContent;
+                    console.log("sedimento")
+                    frappe.model.get_value("Indice Urinario", {
+                        "name": indice
+                    }, "opciones", function(data) {
+                        if (data) {
+                            frm.set_df_property("examen_fisicoquimico", "options", data.opciones, frm.docname, "sedimentos_urinarios");
+                            refresh_field("sedimentos_urinarios");
+                        }
+                    });
+                });
 }

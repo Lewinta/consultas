@@ -8,6 +8,25 @@ from frappe.model.document import Document
 
 class Resultado(Document):
 		
+	def refresh_coprologico(self):
+		self.aspecto_fisico = []
+		filters = {"disponible": 1, "coprologico":1, "tipo_indice":"Aspecto Fisico"}
+		for indice in frappe.get_list("Indice Urinario", filters,["nombre"],order_by="creation ASC",limit_page_length=0):
+		
+			self.append("aspecto_fisico",{
+				"indice_urinario": indice.nombre, 
+				#"examen_fisicoquimico":""
+				
+			})
+		self.aspecto_microscopico = []	
+		filters = {"disponible": 1, "coprologico":1, "tipo_indice":"Aspecto Microscopico"}
+		for indice in frappe.get_list("Indice Urinario", filters, ["nombre"], order_by="creation ASC", limit_page_length=0):
+		
+			self.append("aspecto_microscopico",{
+				"indice_urinario": indice.nombre, 
+				#"examen_fisicoquimico":""
+				
+			})
 	def before_insert(self):
 		result = frappe.db.sql("""SELECT CONCAT('RES-',LPAD(current+1,10,0)) as name FROM `tabSeries` WHERE name = 'RES-'""",as_dict=True)
 		name = result[0].name
@@ -117,10 +136,29 @@ class Resultado(Document):
 				#"examen_fisicoquimico":""
 				
 			})
+
 		self.sedimentos_urinarios = []	
 		for indice in frappe.get_list("Indice Urinario", {"disponible": 1,"sedimento_urinario":1},["nombre"],order_by="creation ASC",limit_page_length=0):
-		
 			self.append("sedimentos_urinarios",{
+				"indice_urinario": indice.nombre, 
+				#"examen_fisicoquimico":""
+				
+			})
+
+		self.aspecto_fisico = []
+		filters = {"disponible": 1, "coprologico":1, "tipo_indice":"Aspecto Fisico"}
+		for indice in frappe.get_list("Indice Urinario", filters,["nombre"],order_by="creation ASC",limit_page_length=0):
+		
+			self.append("aspecto_fisico",{
+				"indice_urinario": indice.nombre, 
+				#"examen_fisicoquimico":""
+				
+			})
+		self.aspecto_microscopico = []	
+		filters = {"disponible": 1, "coprologico":1, "tipo_indice":"Aspecto Microscopico"}
+		for indice in frappe.get_list("Indice Urinario", filters, ["nombre"], order_by="creation ASC", limit_page_length=0):
+		
+			self.append("aspecto_microscopico",{
 				"indice_urinario": indice.nombre, 
 				#"examen_fisicoquimico":""
 				

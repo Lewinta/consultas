@@ -4,7 +4,17 @@
 frappe.ui.form.on('Paciente', {
 	
 	refresh: function(frm) {
-		frappe.model.set_value(frm.doctype,frm.docname,"responsable",frappe.session.user);	
+		frappe.model.set_value(frm.doctype,frm.docname,"responsable",frappe.session.user);
+		frm.trigger("add_toolbar_buttons")	
+	},
+	validate: function(frm){
+		if( frm.doc.sexo == "-")
+		{
+			frappe.msgprint("Debes seleccionar el sexo")
+			validate = false
+			return
+		}	
+
 	},
 	telefono:function(frm){
         frappe.model.set_value(frm.doctype,frm.docname, "telefono",mask_phone(frm.doc.telefono));
@@ -41,24 +51,43 @@ frappe.ui.form.on('Paciente', {
 	{
 		frappe.model.set_value(frm.doctype,frm.docname,"correo_electronico",(frm.doc.correo_electronico).toLowerCase());
 	},
-	add_toolbar_buttons: function(frm) {	
-		if (frm.doc.status == "Approved") {
-			frm.add_custom_button(__('Customer Loan'), function() {
-				frappe.call({
-					type: "GET",
-					method: "fm.finance_manager.doctype.loan_application.loan_application.make_loan",
-					args: {
-						"source_name": frm.doc.name
-					},
-					callback: function(r) {
-						if(!r.exc) {
-							var doc = frappe.model.sync(r.message);
-							frappe.set_route("Form", r.message.doctype, r.message.name);
-						}
-					}
-				});
-			})
+	make_consulta: function(frm) {
+		
+		// the args that it requires
+		var args = {
+			"source_name": frm.doc.name,
+			"tipo_consulta": frm.doc._tipo_consulta
 		}
+
+		// callback to be executed after the server responds
+		var callback = function(response) {
+
+			// check to see if there is something back
+			if (!response.message) 
+				return 1 // exit code is 1
+
+			var doc = frappe.model.sync(response.message)
+			frappe.set_route("Form", response.message.doctype, response.message.name)
+		}
+
+		frappe.call({ "method": frm.doc._temp_consulta, "args": args, "callback": callback })
+	},
+	add_toolbar_buttons: function(frm) {
+				
+		var consulta_privada = function(){
+			frm.doc._tipo_consulta = "Consulta Privada"
+			//set the method to be call on make_consulta
+			frm.doc._temp_consulta = "consultas.consultas.doctype.paciente.paciente.make_consulta"
+			frm.trigger("make_consulta")
+		}
+		var consulta_seguro = function(){
+			frm.doc._tipo_consulta = "Consulta Seguro"
+			//set the method to be call on make_consulta
+			frm.doc._temp_consulta = "consultas.consultas.doctype.paciente.paciente.make_consulta"
+			frm.trigger("make_consulta")
+		}
+		frm.add_custom_button(__('Consulta Privada'), consulta_privada, "Crear")
+		frm.add_custom_button(__('Consulta Seguro' ), consulta_seguro,  "Crear")
 	}
 });
 

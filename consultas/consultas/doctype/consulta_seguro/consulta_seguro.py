@@ -50,3 +50,11 @@ class ConsultaSeguro(Document):
 			return result[0].name
 			
 		return None
+
+@frappe.whitelist()
+def make_resultado(source_name, tipo_consulta, target_doc = None):
+	resultado = frappe.new_doc("Resultado")
+	resultado.consulta_tipo = tipo_consulta	
+	resultado.consulta = source_name	
+
+	return resultado
