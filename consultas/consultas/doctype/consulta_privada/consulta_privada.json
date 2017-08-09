@@ -612,7 +612,7 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2017-07-01 12:33:46.390529", 
+ "modified": "2017-08-07 21:13:13.687456", 
  "modified_by": "Administrator", 
  "module": "Consultas", 
  "name": "Consulta Privada", 
@@ -687,6 +687,6 @@
  "sort_field": "modified", 
  "sort_order": "DESC", 
  "title_field": "paciente", 
- "track_changes": 0, 
+ "track_changes": 1, 
  "track_seen": 0
 }

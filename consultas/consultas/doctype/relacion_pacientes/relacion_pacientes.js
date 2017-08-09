@@ -15,7 +15,8 @@ frappe.ui.form.on('Relacion Pacientes', {
 			args: {
 				"fecha_inicial": frm.doc.fecha_inicial,
 				"fecha_final": frm.doc.fecha_final,
-				"sucursal": frm.doc.sucursal
+				"sucursal": frm.doc.sucursal,
+				"borradores": frm.doc.borradores
 			},
 			callback: function(response) {
 				if(response) {
@@ -32,12 +33,12 @@ frappe.ui.form.on('Relacion Pacientes', {
 							"autorizado":value.autorizado,
 							"diferencia":value.diferencia
 						});
-						privado+=value.privado;
-						reclamado+=value.reclamado;
-						diferencia+=value.diferencia;
+						privado += value.privado;
+						reclamado += value.reclamado;
+						diferencia += value.diferencia;
 					});
-					frm.set_value("total_porciento_seguro",reclamado*(frm.doc.porciento_seguro/100))
-					frm.set_value("total_porciento_privado",privado*(frm.doc.porciento_privado/100))
+					frm.set_value("total_porciento_seguro",reclamado * (frm.doc.porciento_seguro/100))
+					frm.set_value("total_porciento_privado",privado * (frm.doc.porciento_privado/100))
 					frm.set_value("total_asegurados",reclamado)
 					frm.set_value("total_privados",privado)
 					frm.set_value("total_diferencias",diferencia)

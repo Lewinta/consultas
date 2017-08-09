@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+	# -*- coding: utf-8 -*-
 # Copyright (c) 2017, Lewin Villar and contributors
 # For license information, please see license.txt
 
@@ -27,26 +27,35 @@ class Resultado(Document):
 				#"examen_fisicoquimico":""
 				
 			})
-	def before_insert(self):
-		result = frappe.db.sql("""SELECT CONCAT('RES-',LPAD(current+1,10,0)) as name FROM `tabSeries` WHERE name = 'RES-'""",as_dict=True)
-		name = result[0].name
-		frappe.msgprint(name)
-		consulta = frappe.get_doc(self.consulta_tipo,self.consulta)
-		if(consulta):
-			consulta.resultado = name
-			consulta.save()
-
-   	def get_list_indice_quimicos(self):
-		
+	def refresh_personal_info(self):
 		paciente=frappe.get_doc("Paciente",self.paciente)
 		if(paciente):
+			medico = frappe.get_value("Consulta Privada",self.consulta,"medico")
+			nombre_completo = frappe.get_value("Paciente",self.paciente,"nombre_completo")
 			self.edad = paciente.edad
 			self.sexo = paciente.sexo
 			self.telefono = paciente.telefono if paciente.telefono else "-" 
 			self.cedula_pasaporte = paciente.cedula_pasaporte if paciente.cedula_pasaporte else "-"
 			self.direccion = paciente.direccion if paciente.direccion else "-"			
+			self.nombre_completo = nombre_completo			
+			if medico:			
+				self.medico = medico 
+		return True
 
-		result = frappe.db.sql("""SELECT name as prueba,prueba_nombre,uds,metodo,rango_referencia as rango_ref
+	def before_insert(self):
+		result = frappe.db.sql("""SELECT CONCAT('RES-',LPAD(current+1,10,0)) as name FROM `tabSeries` WHERE name = 'RES-'""",as_dict=True)
+		name = result[0].name
+		consulta = frappe.get_doc(self.consulta_tipo,self.consulta)
+		if(consulta):
+			consulta.resultado = name
+			consulta.save()
+
+
+	def get_quimica(self):
+
+		temp = self.indices_pruebas if hasattr(self,'indices_pruebas') else 0.00 
+
+		result = frappe.db.sql("""SELECT prueba as name,prueba_nombre as prueba,uds,metodo,rango_referencia as rango_ref
 		FROM `tabIndice Prueba` 
 			WHERE prueba_name IN (select prueba from `viewPruebas En Consulta` WHERE parent='{0}') AND grupo = 'QUIMICA'"""
 			.format(self.consulta),
@@ -56,7 +65,19 @@ class Resultado(Document):
 		self.test_quimicos = 1 if result else 0
 		for prueba in result:
 			self.append("indices_pruebas",prueba)
-		
+			if prueba.name == "PRB-000000044":
+				self.append("indices_pruebas",{"prueba":"DIRECTA","metodo":"QLM","rango_ref":"0-1.00","uds":"MG/DL"})
+				self.append("indices_pruebas",{"prueba":"INDIRECTA","metodo":"QLM","rango_ref":"0-0.20","uds":"MG/DL"})
+		if temp and result:
+			for row in self.indices_pruebas:
+				for tmp in temp:
+					if row.prueba == tmp.prueba:
+						row.resultado = tmp.resultado
+				
+		return True
+
+	def get_serologia(self):
+		temp = self.serologia  if hasattr(self,'serologia') else 0.00 
 		result = frappe.db.sql("""SELECT name as prueba,prueba_nombre,uds,metodo,rango_referencia as rango_ref
 		FROM `tabIndice Prueba` 
 			WHERE prueba_name IN (select prueba from `viewPruebas En Consulta` WHERE parent='{0}') AND grupo = 'SEROLOGIA'"""
@@ -64,10 +85,20 @@ class Resultado(Document):
 		as_dict=True)
 		
 		self.serologia = []
+		self.test_quimicos = 1 if result else 0
 		for prueba in result:
 			self.append("serologia",prueba)
 
-		result = frappe.db.sql("""SELECT name as prueba,prueba_nombre,uds,metodo,rango_referencia as rango_ref
+		if temp and result:
+			for row in self.serologia:
+				for tmp in temp:
+					if row.prueba == tmp.prueba:
+						row.resultado = tmp.resultado
+		return True
+
+	def get_inmunodiagnostico(self):
+		temp = self.inmunodiagnosticos if hasattr(self,'inmunodiagnosticos') else 0.00 
+		result = frappe.db.sql("""SELECT prueba as prueba_name,prueba_nombre as prueba,uds,metodo,rango_referencia as rango_ref
 		FROM `tabIndice Prueba` 
 			WHERE prueba_name IN (select prueba from `viewPruebas En Consulta` WHERE parent='{0}') 
 			AND grupo = 'INMUNODIAGNOSTICOS'
@@ -79,7 +110,22 @@ class Resultado(Document):
 		self.test_inmunodiagnosticos = 1 if result else 0 
 		for prueba in result:
 			self.append("inmunodiagnosticos",prueba)
+			if prueba.prueba_name == "PRB-000000059":
+				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba": " ", "metodo": "CONTROL", "rango_ref": "          ", "uds": "SEGUNDOS"})	
+				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba": " ", "metodo": "INR"    , "rango_ref": "0.9 - 1.2" , "uds": "SEGUNDOS"})	
+				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba": " ", "metodo": "%"      , "rango_ref": "70 - 120"," uds":"%"})	
 
+			if prueba.prueba_name == "PRB-000000060":
+				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba":" ", "metodo": "CONTROL", "rango_ref": "          ", "uds": "SEGUNDOS"})	
+		if temp and result:
+			for row in self.inmunodiagnosticos:
+				for tmp in temp:
+					if row.prueba_name == tmp.prueba_name and row.metodo == tmp.metodo :
+						row.resultado = tmp.resultado
+		return True
+
+	def get_hormonas(self):
+		temp = self.hormonas if hasattr(self,'hormonas') else 0.00 
 		result = frappe.db.sql("""SELECT name as prueba,prueba_nombre,uds,metodo,rango_referencia as rango_ref
 		FROM `tabIndice Prueba` 
 			WHERE prueba_name IN (select prueba from `viewPruebas En Consulta` WHERE parent='{0}') AND grupo = 'HORMONAS'"""
@@ -90,8 +136,15 @@ class Resultado(Document):
 		self.test_hormonas = 1 if result else  0 
 		for prueba in result:
 			self.append("hormonas",prueba)
+		if temp and result:
+			for row in self.hormonas:
+				for tmp in temp:
+					if row.prueba == tmp.prueba:
+						row.resultado = tmp.resultado
+		return True
 
-
+	def get_tipificacion(self):
+		temp = self.tipificacion if hasattr(self,'tipificacion') else 0.00 
 		result = frappe.db.sql("""SELECT name as prueba,prueba_nombre,uds,metodo,rango_referencia as rango_ref
 		FROM `tabIndice Prueba` 
 			WHERE prueba_name IN (select prueba from `viewPruebas En Consulta` WHERE parent='{0}') 
@@ -101,16 +154,25 @@ class Resultado(Document):
 		
 		self.tipificacion = []
 		self.test_tipificacion = 1 if result else 0
+		self.test_inmunodiagnosticos = 1 if result else 0 
 		for prueba in result:
 			self.append("tipificacion",prueba)
+		if temp and result:
+			for row in self.tipificacion:
+				for tmp in temp:
+					if row.prueba == tmp.prueba:
+						row.resultado = tmp.resultado
+		return True
 
+	def get_hematologia(self):
+		temp = self.indices_hematologicos if hasattr(self,'indices_hematologicos') else 0.00 
 		result = frappe.db.sql("""SELECT prueba from `viewPruebas En Consulta` WHERE parent='{0}' AND prueba = 'PRB-000000195' """  
 			.format(self.consulta),
 		as_dict=True)
 
 		self.indices_hematologicos = []
 		self.test_hematologico = 1 if result else 0	
-		for indice in frappe.get_list("Indice Hematologico", {"disponible": 1,"recuento_diferencial":0}, ["name", "uds","rango_referencia"],order_by="creation ASC", limit_page_length=0):
+		for indice in frappe.get_list("Indice Hematologico", {"disponible": 1,"recuento_diferencial":0,"otros_hematologia":0}, ["name", "uds","rango_referencia"],order_by="creation ASC", limit_page_length=0):
 			
 			self.append("indices_hematologicos",{
 				"rango_referencia": indice.rango_referencia,
@@ -118,7 +180,14 @@ class Resultado(Document):
 				#"resultado":"-",
 				"indice_hematologico":indice.name
 			})
+
+		if temp and result:
+			for row in self.indices_hematologicos:
+				for tmp in temp:
+					if row.indice_hematologico == tmp.indice_hematologico:
+						row.resultado = tmp.resultado
 		
+		temp = self.recuento_diferencial if hasattr(self,'recuento_diferencial') else 0.00 
 		self.recuento_diferencial = []	
 		for indice in frappe.get_list("Indice Hematologico", {"disponible": 1,"recuento_diferencial":1}, ["name", "uds","rango_referencia"],order_by="creation ASC", limit_page_length=0):
 			
@@ -128,41 +197,97 @@ class Resultado(Document):
 				#"resultado":"-",
 				"indice_hematologico":indice.name
 			})
-			
+
+		if temp and result:
+			for row in self.recuento_diferencial:
+				for tmp in temp:
+					if row.indice_hematologico == tmp.indice_hematologico:
+						row.resultado = tmp.resultado
+
+		self.otros_hematologia = []
+		
+		consulta = frappe.get_doc( self.consulta_tipo, self.consulta )	
+		
+		for p in consulta.pruebas:
+			for indice in  frappe.get_list("Indice Hematologico",{"prueba":p.prueba},["indice_hematologico","rango_referencia","uds"]):
+				self.append("otros_hematologia",indice)
+
+		return True
+
+	def get_urianalisis(self):
+
+		temp = self.indices_urinarios if hasattr(self,'indices_urinarios') else 0.00 
 		self.indices_urinarios = []
-		for indice in frappe.get_list("Indice Urinario", {"disponible": 1,"sedimento_urinario":0},["nombre"],order_by="creation ASC",limit_page_length=0):
+		result = frappe.get_list("Indice Urinario", {"disponible": 1,"sedimento_urinario":0,"coprologico":0},["nombre"],order_by="creation ASC",limit_page_length=0)
+		for indice in result:
 			self.append("indices_urinarios",{
 				"indice_urinario": indice.nombre, 
 				#"examen_fisicoquimico":""
 				
 			})
 
+		if temp and result:
+			for row in self.indices_urinarios:
+				for tmp in temp:
+					if row.indice_urinario == tmp.indice_urinario:
+						row.examen_fisicoquimico = tmp.examen_fisicoquimico
+
+		temp = self.sedimentos_urinarios if hasattr(self,'sedimentos_urinarios') else 0.00 
+
 		self.sedimentos_urinarios = []	
-		for indice in frappe.get_list("Indice Urinario", {"disponible": 1,"sedimento_urinario":1},["nombre"],order_by="creation ASC",limit_page_length=0):
+		result = frappe.get_list("Indice Urinario", {"disponible": 1,"sedimento_urinario":1},["nombre"],order_by="creation ASC",limit_page_length=0)
+		for indice in result:
 			self.append("sedimentos_urinarios",{
 				"indice_urinario": indice.nombre, 
 				#"examen_fisicoquimico":""
 				
 			})
 
+		if temp and result:
+			for row in self.sedimentos_urinarios:
+				for tmp in temp:
+					if row.indice_urinario == tmp.indice_urinario:
+						row.examen_fisicoquimico = tmp.examen_fisicoquimico
+		return True
+	def get_coprologia(self):
+		temp = self.aspecto_fisico if hasattr(self,'aspecto_fisico') else 0.00 
 		self.aspecto_fisico = []
 		filters = {"disponible": 1, "coprologico":1, "tipo_indice":"Aspecto Fisico"}
-		for indice in frappe.get_list("Indice Urinario", filters,["nombre"],order_by="creation ASC",limit_page_length=0):
+		result = frappe.get_list("Indice Urinario", filters,["nombre"],order_by="creation ASC",limit_page_length=0)
+		for indice in result:
 		
 			self.append("aspecto_fisico",{
 				"indice_urinario": indice.nombre, 
 				#"examen_fisicoquimico":""
 				
 			})
+
+		if temp and result:
+			for row in self.aspecto_fisico:
+				for tmp in temp:
+					if row.indice_urinario == tmp.indice_urinario:
+						row.examen_fisicoquimico = tmp.examen_fisicoquimico
+
+		temp = self.aspecto_microscopico  if hasattr(self,'aspecto_microscopico') else 0.00 
 		self.aspecto_microscopico = []	
 		filters = {"disponible": 1, "coprologico":1, "tipo_indice":"Aspecto Microscopico"}
-		for indice in frappe.get_list("Indice Urinario", filters, ["nombre"], order_by="creation ASC", limit_page_length=0):
+		result = frappe.get_list("Indice Urinario", filters, ["nombre"], order_by="creation ASC", limit_page_length=0)
+		for indice in result:
 		
 			self.append("aspecto_microscopico",{
 				"indice_urinario": indice.nombre, 
 				#"examen_fisicoquimico":""
 				
 			})
+
+		if temp and result:
+			for row in self.aspecto_microscopico:
+				for tmp in temp:
+					if row.indice_urinario == tmp.indice_urinario:
+						row.examen_fisicoquimico = tmp.examen_fisicoquimico
+		
+		return True
+	def get_anexos(self):
 
 		consulta = frappe.get_doc(self.consulta_tipo, self.consulta)
 		# centinela para mostrar o no el section break de anexos
@@ -179,12 +304,16 @@ class Resultado(Document):
 					self.append(tbl_anexo, anexo)
 			self.test_anexos = show_anexos 
 
+		return True
 
-       
-		# result = frappe.db.sql("""SELECT prueba from `viewPruebas En Consulta` WHERE parent='{0}' AND prueba = 'PRB-000000065' """  
-		# 	.format(self.consulta),
-		# as_dict=True)
-		# self.test_anexos = 1 if result else 0
-		# self.anx_tsh = []
-		
-		
+	def get_table_items(self):
+		self.refresh_personal_info()
+		self.get_quimica()
+		self.get_serologia()
+		self.get_inmunodiagnostico()
+		self.get_hormonas()
+		self.get_tipificacion()
+		self.get_hematologia()
+		self.get_urianalisis()
+		self.get_coprologia()
+		self.get_anexos()

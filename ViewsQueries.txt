@@ -3,6 +3,6 @@
 CREATE VIEW `viewPruebas En Consulta` (parent,prueba) AS ((select parent,prueba from `tabConsulta Prueba Privada` ) UNION (select parent,prueba from `tabConsulta Prueba`) );
 
 
-create view `viewRelacion Pacientes`  as (select fecha,name,'Consulta Privada' as tipo,paciente,' ' as ars_nombre,diferencia as privado,0 as reclamado,0 as autorizado,0 as diferencia,medico,sucursal,sucursal_nombre from `tabConsulta Privada` )
+create view `viewRelacion Pacientes`  as (select fecha,name,'Consulta Privada' as tipo,paciente,' ' as ars_nombre,diferencia as privado,0 as reclamado,0 as autorizado,0 as diferencia,medico,sucursal,sucursal_nombre, docstatus from `tabConsulta Privada` )
 	union 
-(select fecha,name,'Consulta Seguro' as tipo,paciente,ars_nombre,0 as privado, reclamado,autorizado,diferencia,medico,sucursal,sucursal_nombre from `tabConsulta Seguro`);
+(select fecha,name,'Consulta Seguro' as tipo,paciente,ars_nombre,0 as privado, reclamado,autorizado,diferencia,medico,sucursal,sucursal_nombre,docstatus from `tabConsulta Seguro`);

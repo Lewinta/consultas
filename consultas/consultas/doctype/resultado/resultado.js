@@ -3,10 +3,10 @@
 frappe.ui.form.on('Resultado', {
 
     onload_post_render: function(frm) {
-    	var microbiologia_sb = $('.section-head').find("a").filter(function(){ return $(this).text() == "Microbiologia" ;}).parent()
+        /*var microbiologia_sb = $('.section-head').find("a").filter(function(){ return $(this).text() == "Microbiologia" ;}).parent()
         var fields = ["titulo","antibiogramas" ]
         var current_table
-        frm.trigger("consulta")
+        
 
         fields.forEach(function(indice){
 			frm.set_df_property(indice,"hidden",1);
@@ -23,14 +23,18 @@ frappe.ui.form.on('Resultado', {
 				frm.set_df_property("antibiogramas","hidden",1);
 			}	
 		});
-        setTimeout(function() {
+        */setTimeout(function() {
             //$("div[data-page-route='Form/Resultado'] .btn.btn-xs.btn-default.grid-add-row").hide();
             set_events(frm)
             //}
-        }, 500);
+        }, 1000);
     },
     refresh: function(frm) {
         refresh_modules(frm);
+
+        if(frm.doc.docstatus == 0)
+            frm.trigger("add_toolbar_buttons")
+
         cur_frm.set_query("consulta", function() {
             return {
                 "filters": {
@@ -55,11 +59,11 @@ frappe.ui.form.on('Resultado', {
             //$("div[data-page-route='Form/Resultado'] .btn.btn-xs.btn-default.grid-add-row").hide();
             set_events(frm)
             //}
-        }, 500);
+        }, 300);
 
    },
     consulta: function(frm) {
-        
+
         refresh_modules(frm);		
         if (frm.doc.consulta) {
             frappe.call({
@@ -74,10 +78,11 @@ frappe.ui.form.on('Resultado', {
 					frappe.model.set_value(frm.doctype,frm.docname,"edad",data.message.edad);
 					frappe.model.set_value(frm.doctype,frm.docname,"direccion",data.message.direccion?data.message.direccion:"-");
 					frappe.model.set_value(frm.doctype,frm.docname,"telefono",data.message.telefono?data.message.telefono:"-");
+
 			   }
             });
             $c("runserverobj", {
-                "method": "get_list_indice_quimicos",
+                "method": "get_table_items",
                 "docs": frm.doc
             }, function(response) {
                 refresh_many([
@@ -97,7 +102,8 @@ frappe.ui.form.on('Resultado', {
                     "tipificacion",
                     "hormonas",
                     "aspecto_fisico",
-                    "aspecto_microscopico"
+                    "aspecto_microscopico",
+                    "nombre_completo"
                     ]);
                 frm.refresh();
             });
@@ -131,12 +137,149 @@ frappe.ui.form.on('Resultado', {
                         }
                     });
                 });*/
-            }, 3000);
+            }, 2000);
             //setTimeout(function(){frappe.dom.unfreeze();},2000);
         }
         frappe.dom.unfreeze();
+    },
+    add_toolbar_buttons: function(frm){
+        
+        var personal_info = function(){
+            $c('runserverobj', {"method": "refresh_personal_info", "docs": frm.doc}, function(response){
+                if(response.message){
+                    frappe.show_alert("Cliente Actualizado!",5);
+                    refresh_field("cedula_pasaporte")
+                    refresh_field("sexo")
+                    refresh_field("edad")
+                    refresh_field("telefono")
+                    refresh_field("direccion")
+                    refresh_field("medico")
+                    refresh_field("nombre_completo")
+                    frm.dirty()
+                }
+
+            });
+        }
+
+        var hematologia = function(){
+            $c('runserverobj', {"method": "get_hematologia", "docs": frm.doc}, function(response){
+                if(response.message){
+                    refresh_field("indices_hematologicos")
+                    refresh_field("otros_hematologia")
+                    frappe.show_alert("Hematologia Actualizado!",5);
+                }
+
+            });
+        }
+
+        var quimica = function(){
+            $c('runserverobj', {"method": "get_quimica", "docs": frm.doc}, function(response){
+                if(response.message){
+                    refresh_field("indices_pruebas")
+                    frappe.show_alert("Quimica Actualizada!",5);
+                }
+
+            });
+        }
+
+        var serologia = function(){
+            $c('runserverobj', {"method": "get_serologia", "docs": frm.doc}, function(response){
+                if(response.message){
+                    refresh_field("serologia")
+                    frappe.show_alert("Serologia Actualizada!",5);
+                }
+
+            });
+        }
+
+        var inmunodiagnosticos = function(){
+            $c('runserverobj', {"method": "get_inmunodiagnostico", "docs": frm.doc}, function(response){
+                if(response.message){
+                    refresh_field("inmunodiagnosticos")
+                    frappe.show_alert("Inmunodiagnosticos Actualizados!",5);
+                }
+
+            });
+        }
+
+        var hormonas = function(){
+            $c('runserverobj', {"method": "get_hormonas", "docs": frm.doc}, function(response){
+                if(response.message){
+                    refresh_field("hormonas")
+                    frappe.show_alert("Hormonas Actualizadas!",5);
+                }
+
+            });
+        }
+
+        var tipificacion = function(){
+            $c('runserverobj', {"method": "get_tipificacion", "docs": frm.doc}, function(response){
+                if(response.message){
+                    refresh_field("tipificacion")
+                    frappe.show_alert("Tipificacion Actualizada!",5);
+                }
+
+            });
+        }
+
+        var urianalisis = function(){
+            $c('runserverobj', {"method": "get_urianalisis", "docs": frm.doc}, function(response){
+                if(response.message){
+                    refresh_field("indices_urinarios")
+                    refresh_field("sedimentos_urinarios")
+                    set_events()
+                    frappe.show_alert("Urianalisis Actualizado!",5);
+                }
+
+            });
+        }
+
+        var coprologia = function(){
+            $c('runserverobj', {"method": "get_coprologia", "docs": frm.doc}, function(response){
+                if(response.message){
+                    refresh_field("aspecto_fisico")
+                    refresh_field("aspecto_microscopico")
+                    set_events()
+                    frappe.show_alert("Coprologia Actualizada!",5);
+                }
+
+            });
+        }
+
+        var anexos = function(){
+            $c('runserverobj', {"method": "get_anexos", "docs": frm.doc}, function(response){
+                if(response.message){
+                    refresh_anexos(frm)
+                    frappe.show_alert("Anexos Actualizado!",5);
+                }
+
+            });
+        }
+
+        frm.add_custom_button("Informacion Personal",personal_info,"Actualizar" )
+        frm.add_custom_button("Hematologia",hematologia,"Actualizar" )
+        frm.add_custom_button("Quimica",quimica,"Actualizar" )
+        frm.add_custom_button("Serologia",serologia,"Actualizar" )
+        frm.add_custom_button("Inmunodiagnosticos",inmunodiagnosticos,"Actualizar" )
+        frm.add_custom_button("Hormonas",hormonas,"Actualizar" )
+        frm.add_custom_button("Tipificacion",tipificacion,"Actualizar" )
+        frm.add_custom_button("Urianalisis",urianalisis,"Actualizar" )
+        frm.add_custom_button("Coprologia",coprologia,"Actualizar" )
+        frm.add_custom_button("Anexos",anexos,"Actualizar" )
     }
 });
+function refresh_anexos(frm){
+
+	refresh_field("test_prb_000000065")
+	refresh_field("tsh_heading")
+	refresh_field("prb_000000065")
+	refresh_field("test_prb_000000177")
+	refresh_field("fsh_heading")
+	refresh_field("prb_000000177")
+	refresh_field("bhcg_heading")
+	refresh_field("prb_000000120")
+	refresh_field("test_prb_000000065")
+}
 
 function refresh_modules(frm) {
 
@@ -173,6 +316,14 @@ function refresh_modules(frm) {
         else {
             frm.set_value("test_coprologico", 0)
         }
+    }); 
+    frappe.model.get_value(tipoResultado, {"parent": frm.doc.consulta,"prueba": "PRB-000000194"}, "prueba_nombre", function(data) {
+        if (data) {
+            frm.set_value("test_microbiologia", 1)
+        } 
+        else {
+            frm.set_value("test_microbiologia", 0)
+        }
     });
    
    /* frappe.model.get_value(tipoResultado, {"parent": frm.doc.consulta,"prueba": "PRB-000000224"}, "prueba_nombre", function(data) {
@@ -195,40 +346,37 @@ function refresh_modules(frm) {
 }
 function set_events(frm)
 {
-     $("div[data-fieldtype='Table']").mouseenter(function(event)
-            {
-                    console.log(event.currentTarget.dataset.fieldname) 
-                    current_table = event.currentTarget.dataset.fieldname
-            })
-
+    console.log("events added")
+    $("div[data-fieldtype='Table']").mouseenter(function(event){
+        
+        current_table = event.currentTarget.dataset.fieldname
+    })
 
            // if (frm.doc.indices_urinarios) {
-                $("div[data-fieldname='examen_fisicoquimico']").click(function(event) {
-                    console.log("event")
-                    var indice = event.currentTarget.parentElement.childNodes[1].textContent;
-                    frappe.model.get_value("Indice Urinario", {
-                        "name": indice
-                    }, "opciones", function(data) {
-                        if (data) {
-                            console.log("indice: "+ indice+"opciones:"+data.opciones)
-                            frm.set_df_property("examen_fisicoquimico", "options", data.opciones, frm.docname, current_table);
-                            refresh_field(current_table);
-                            
-                        }
-                    });
-                });
+    $("div[data-fieldname='examen_fisicoquimico']").click(function(event) {
+        var indice = event.currentTarget.parentElement.childNodes[1].textContent;
+        frappe.model.get_value("Indice Urinario", {
+            "name": indice
+        }, "opciones", function(data) {
+            if (data) {
+                frm.set_df_property("examen_fisicoquimico", "options", data.opciones, frm.docname, current_table);
+                refresh_field(current_table);
+                
+            }
+        });
+    });
                 //remove eventsbefore adding it
                 //$("[data-fieldname='sedimentos_urinarios'] [data-fieldname='sedimentos_urinarios'] div[data-fieldname='examen_fisicoquimico']").off("click");
-                $("[data-fieldname='sedimentos_urinarios'] [data-fieldname='sedimentos_urinarios'] div[data-fieldname='examen_fisicoquimico']").click(function(event) {
-                    var indice = event.currentTarget.parentElement.childNodes[1].textContent;
-                    console.log("sedimento")
-                    frappe.model.get_value("Indice Urinario", {
-                        "name": indice
-                    }, "opciones", function(data) {
-                        if (data) {
-                            frm.set_df_property("examen_fisicoquimico", "options", data.opciones, frm.docname, "sedimentos_urinarios");
-                            refresh_field("sedimentos_urinarios");
-                        }
-                    });
-                });
+        $("[data-fieldname='sedimentos_urinarios'] [data-fieldname='sedimentos_urinarios'] div[data-fieldname='examen_fisicoquimico']").click(function(event) {
+            var indice = event.currentTarget.parentElement.childNodes[1].textContent;
+            frappe.model.get_value("Indice Urinario", {
+                "name": indice,
+                "coprologico":0
+            }, "opciones", function(data) {
+                if (data) {
+                    frm.set_df_property("examen_fisicoquimico", "options", data.opciones, frm.docname, "sedimentos_urinarios");
+                    refresh_field("sedimentos_urinarios");
+                }
+            });
+        });
 }
