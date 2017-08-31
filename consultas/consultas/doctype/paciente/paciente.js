@@ -86,6 +86,25 @@ frappe.ui.form.on('Paciente', {
 			frm.doc._temp_consulta = "consultas.consultas.doctype.paciente.paciente.make_consulta"
 			frm.trigger("make_consulta")
 		}
+		var calcula_edad = function(){
+			
+			var fields = [{
+				"fieldname": "fecha_nacimiento",
+				"fieldtype": "Date",
+				"label": "Fecha de Nacimiento",
+				"default": frappe.datetime.get_today()
+			}]
+
+			var onsubmit = function(values){
+    			
+    			var days = frappe.datetime.get_diff(frappe.datetime.get_today(), values.fecha_nacimiento)
+    			cur_frm.set_value("edad",parseInt(days/365))
+			}
+ 
+			frappe.prompt(fields,onsubmit,'Calcular Edad del Paciente','Calcular')
+		}
+
+		frm.add_custom_button(__('Calcular Edad' ), calcula_edad)
 		frm.add_custom_button(__('Consulta Privada'), consulta_privada, "Crear")
 		frm.add_custom_button(__('Consulta Seguro' ), consulta_seguro,  "Crear")
 	}

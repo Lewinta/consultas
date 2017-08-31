@@ -60,23 +60,15 @@ frappe.ui.form.on('Consulta Seguro',
         if(frm.doc.autorizacion )
         {
         	autorizacion = (frm.doc.autorizacion.trim()).substring(0,1).toUpperCase();	 
-        	if(autorizacion != "P" && frm.doc.ars == "ARS-000004" && autorizacion.length > 0)
+        	if(frm.doc.ars == "ARS-000004" && autorizacion != "P" )
         	{
         		frappe.msgprint("Las Autorizaciones de " + frm.doc.ars_nombre + " Comienzan con 'P' verifique la ARS por favor!")
-        		console.log("4 Executed");
         		validated = false;
         		return false
         	}
-        	else 
-        	{
-        		validated = true;
-        		return true;
-        	}
-
-        	if(autorizacion != "H" && frm.doc.ars == "ARS-000002" && autorizacion.length > 0)
+        	else if(frm.doc.ars == "ARS-000002" && autorizacion != "H" )
         	{
         		frappe.msgprint("Las Autorizaciones de " + frm.doc.ars_nombre + " Comienzan con 'H' verifique la ARS por favor!")
-        		console.log("2 Executed");
         		validated = false;
         		return false
         	}
