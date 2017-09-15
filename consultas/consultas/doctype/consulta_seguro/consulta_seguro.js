@@ -4,7 +4,6 @@ frappe.ui.form.on('Consulta Seguro',
 {
     onload: function(frm)
     {
-		
         if (!frm.doc.__islocal) return;
         frappe.model.set_value(frm.doctype, frm.docname, "fecha", new Date());
         var callback = function(data)
@@ -168,8 +167,8 @@ frappe.ui.form.on('Consulta Seguro',
 
 
 frappe.ui.form.on("Consulta Prueba",
-{	prueba:
-	function(frm,cdt,cdn)
+{	
+	prueba:function(frm,cdt,cdn)
 	{
 		var tAutorizado=0,tDiferencia=0,tReclamado=0;
 		var row = locals[cdt][cdn];
@@ -205,11 +204,8 @@ frappe.ui.form.on("Consulta Prueba",
 
 		if (row.prueba)frappe.model.get_value("Lista Precio", {ars_medico: frm.doc.ars,prueba: row.prueba},"monto", busca_precio);
 		else frm.get_field("pruebas").grid.grid_rows[row.idx-1].remove();
-		 
-		
 	},
-	autorizado:
-	function(frm,cdt,cdn)
+	autorizado:function(frm,cdt,cdn)
 	{
 		var tAutorizado=0,tDiferencia=0,tReclamado=0;
 		var row = locals[cdt][cdn];
@@ -225,8 +221,7 @@ frappe.ui.form.on("Consulta Prueba",
 			frappe.model.set_value(frm.doctype,frm.docname,"diferencia",tDiferencia);	
 		});	
 	},
-	diferencia:
-	function(frm,cdt,cdn)
+	diferencia:	function(frm,cdt,cdn)
 	{
 		var tAutorizado=0,tDiferencia=0,tReclamado=0;
 		var row = locals[cdt][cdn];
@@ -239,5 +234,25 @@ frappe.ui.form.on("Consulta Prueba",
 			frappe.model.set_value(frm.doctype,frm.docname,"reclamado",tReclamado);
 			frappe.model.set_value(frm.doctype,frm.docname,"diferencia",tDiferencia);	
 		});	
+	},
+	pruebas_remove:function(frm,cdt,cdn)
+	{
+		var tAutorizado=0,tDiferencia=0,tReclamado=0;
+		if(frm.doc.pruebas.length > 0){
+
+			frm.doc.pruebas.forEach(function(child){
+				if (child.autorizado) tAutorizado += child.autorizado;
+				if (child.diferencia) tDiferencia += child.diferencia;
+				if (child.reclamado) tReclamado += child.reclamado;
+				frappe.model.set_value(frm.doctype,frm.docname, "autorizado", tAutorizado);
+				frappe.model.set_value(frm.doctype,frm.docname, "reclamado", tReclamado);
+				frappe.model.set_value(frm.doctype,frm.docname, "diferencia", tDiferencia);
+			});	
+		}else{
+			frappe.model.set_value(frm.doctype, frm.docname, "autorizado", 0);
+			frappe.model.set_value(frm.doctype, frm.docname, "reclamado", 0);
+			frappe.model.set_value(frm.doctype, frm.docname, "diferencia", 0);
+		}
+
 	}
 });
