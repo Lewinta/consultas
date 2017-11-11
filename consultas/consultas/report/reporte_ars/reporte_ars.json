@@ -1,0 +1,30 @@
+{
+ "add_total_row": 1, 
+ "apply_user_permissions": 0, 
+ "creation": "2017-09-15 10:22:27.878001", 
+ "disabled": 0, 
+ "docstatus": 0, 
+ "doctype": "Report", 
+ "idx": 0, 
+ "is_standard": "Yes", 
+ "letter_head": "Hoja Timbrada", 
+ "modified": "2017-09-17 21:55:12.422645", 
+ "modified_by": "Administrator", 
+ "module": "Consultas", 
+ "name": "Reporte ARS", 
+ "owner": "Administrator", 
+ "ref_doctype": "Consulta Seguro", 
+ "report_name": "Reporte ARS", 
+ "report_type": "Script Report", 
+ "roles": [
+  {
+   "role": "Empleados"
+  }, 
+  {
+   "role": "Supervisores"
+  }, 
+  {
+   "role": "Gerentes"
+  }
+ ]
+}

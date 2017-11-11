@@ -106,6 +106,10 @@ frappe.ui.form.on('Resultado', {
                     "nombre_completo"
                     ]);
                 frm.refresh();
+                /*Por alguna razon no se muestran el section break cuando hay inmunodiagnosticos aun y test_inmunodiagnosticos es 1
+                Lo siguiente es una solucion temporal */
+               if (! frm.doc.inmunodiagnosticos ||  frm.doc.inmunodiagnosticos.length <= 0 )
+                    frm.set_df_property('inmunodiagnostico', 'hidden', 1)
             });
             frappe.dom.freeze("Espere...");
             //remove eventsbefore adding it
@@ -194,6 +198,7 @@ frappe.ui.form.on('Resultado', {
 
         var inmunodiagnosticos = function(){
             $c('runserverobj', {"method": "get_inmunodiagnostico", "docs": frm.doc}, function(response){
+                console.log('inmunodiagnosticos ' )
                 if(response.message){
                     refresh_field("inmunodiagnosticos")
                     frappe.show_alert("Inmunodiagnosticos Actualizados!",5);

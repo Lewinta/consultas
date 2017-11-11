@@ -14,6 +14,7 @@
  "engine": "InnoDB", 
  "fields": [
   {
+   "allow_bulk_edit": 0, 
    "allow_on_submit": 0, 
    "bold": 0, 
    "collapsible": 0, 
@@ -44,6 +45,7 @@
    "unique": 1
   }, 
   {
+   "allow_bulk_edit": 0, 
    "allow_on_submit": 0, 
    "bold": 0, 
    "collapsible": 0, 
@@ -73,6 +75,7 @@
    "unique": 0
   }, 
   {
+   "allow_bulk_edit": 0, 
    "allow_on_submit": 0, 
    "bold": 0, 
    "collapsible": 0, 
@@ -103,6 +106,7 @@
    "unique": 0
   }, 
   {
+   "allow_bulk_edit": 0, 
    "allow_on_submit": 0, 
    "bold": 0, 
    "collapsible": 0, 
@@ -131,6 +135,7 @@
    "unique": 0
   }, 
   {
+   "allow_bulk_edit": 0, 
    "allow_on_submit": 0, 
    "bold": 0, 
    "collapsible": 0, 
@@ -161,6 +166,7 @@
    "unique": 1
   }, 
   {
+   "allow_bulk_edit": 0, 
    "allow_on_submit": 0, 
    "bold": 0, 
    "collapsible": 0, 
@@ -191,6 +197,7 @@
    "unique": 0
   }, 
   {
+   "allow_bulk_edit": 0, 
    "allow_on_submit": 0, 
    "bold": 0, 
    "collapsible": 0, 
@@ -207,7 +214,7 @@
    "label": "Metodo", 
    "length": 0, 
    "no_copy": 0, 
-   "options": "QLM\nFLOCULACION\nGRUPO / FACTOR RH\nELISA\nEIA\nCLIA\nRIA\nQEIA\nFRECUENCIA\nAFF-COOL\nIFA\nIGG\nIGM\n-", 
+   "options": "QLM\nFLOCULACION\nGRUPO / FACTOR RH\nINMUNOTURBIDIMETRIA\nELISA\nEIA\nCLIA\nRIA\nQEIA\nFRECUENCIA\nAFF-COOL\nIFA\nIGG\nIGM\n-", 
    "permlevel": 0, 
    "precision": "", 
    "print_hide": 0, 
@@ -221,6 +228,7 @@
    "unique": 0
   }, 
   {
+   "allow_bulk_edit": 0, 
    "allow_on_submit": 0, 
    "bold": 0, 
    "collapsible": 0, 
@@ -238,7 +246,7 @@
    "label": "Grupo", 
    "length": 0, 
    "no_copy": 0, 
-   "options": "QUIMICA\nSEROLOGIA\nINMUNODIAGNOSTICOS\nHORMONAS\nESPECIALES", 
+   "options": "QUIMICA\nSEROLOGIA\nINMUNODIAGNOSTICOS\nHORMONAS\nESPECIALES\nCOAGULACION", 
    "permlevel": 0, 
    "precision": "", 
    "print_hide": 0, 
@@ -262,8 +270,8 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2017-07-20 14:54:47.798124", 
- "modified_by": "lewin.villar@gmail.com", 
+ "modified": "2017-11-02 16:31:01.784671", 
+ "modified_by": "Administrator", 
  "module": "Consultas", 
  "name": "Indice Prueba", 
  "name_case": "", 

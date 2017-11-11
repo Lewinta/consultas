@@ -64,10 +64,19 @@ class Resultado(Document):
 		self.indices_pruebas = []
 		self.test_quimicos = 1 if result else 0
 		for prueba in result:
-			self.append("indices_pruebas",prueba)
 			if prueba.name == "PRB-000000044":
-				self.append("indices_pruebas",{"prueba":"DIRECTA","metodo":"QLM","rango_ref":"0-1.00","uds":"MG/DL"})
-				self.append("indices_pruebas",{"prueba":"INDIRECTA","metodo":"QLM","rango_ref":"0-0.20","uds":"MG/DL"})
+				self.append("indices_pruebas",{"prueba":"BILIRRUBINA TOTAL","metodo":"QLM","rango_ref":"0.0 - 1.00","uds":"MG/DL"})
+				self.append("indices_pruebas",{"prueba":"DIRECTA","metodo":"QLM","rango_ref":"0-0.20","uds":"MG/DL"})
+				self.append("indices_pruebas",{"prueba":"INDIRECTA","metodo":"QLM","rango_ref":"-","uds":"MG/DL"})
+				continue
+			if prueba.name == "PRB-000000046":
+				frappe.errprint("tiene proteina")
+				self.append("indices_pruebas",{"prueba":"PROTEINAS TOTALES","metodo":"QLM","rango_ref":"6.0 - 8.0","uds":"MG/DL"})
+				self.append("indices_pruebas",{"prueba":"ALBUMINA","metodo":"QLM","rango_ref":"3.5 - 4.8","uds":"MG/DL"})
+				self.append("indices_pruebas",{"prueba":"GLOBULINA","metodo":"QLM","rango_ref":"2.0 - 4.0","uds":"MG/DL"})
+				self.append("indices_pruebas",{"prueba":"INDICE A/G","metodo":"QLM","rango_ref":"1.2 - 2.2","uds":"MG/DL"})
+				continue
+			self.append("indices_pruebas",prueba)
 		if temp and result:
 			for row in self.indices_pruebas:
 				for tmp in temp:
@@ -105,7 +114,6 @@ class Resultado(Document):
 			AND prueba <>'PRB-000000224'"""
 			.format(self.consulta),
 		as_dict=True)
-		
 		self.inmunodiagnosticos = []
 		self.test_inmunodiagnosticos = 1 if result else 0 
 		for prueba in result:
@@ -122,7 +130,11 @@ class Resultado(Document):
 				for tmp in temp:
 					if row.prueba_name == tmp.prueba_name and row.metodo == tmp.metodo :
 						row.resultado = tmp.resultado
-		return True
+		if self.test_inmunodiagnosticos:
+			return True
+		else:
+			return False
+
 
 	def get_hormonas(self):
 		temp = self.hormonas if hasattr(self,'hormonas') else 0.00 
