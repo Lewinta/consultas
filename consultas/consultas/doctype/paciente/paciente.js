@@ -7,18 +7,44 @@ frappe.ui.form.on('Paciente', {
 		frappe.model.set_value(frm.doctype,frm.docname,"responsable",frappe.session.user);
 		frm.trigger("add_toolbar_buttons")	
 	},
+	after_save: function(frm) {
+		if(frm.doc.name != frm.doc.nombre_completo){
+			var doctype = cur_frm.doctype;
+			var docname = cur_frm.docname;
+			var old_name = cur_frm.docname;
+			var new_name = cur_frm.doc.nombre_completo;
+
+			frappe.call({
+				method: "frappe.model.rename_doc.rename_doc",
+				args: {
+					"doctype": doctype,
+					"old": old_name,
+					"new": new_name,
+					"merge": false
+				},
+				callback: function callback(r, rt) {
+					if (!r.exc) {
+						$(document).trigger('rename', [doctype, docname, r.message || new_name]);
+						if (locals[doctype] && locals[doctype][docname]) delete locals[doctype][docname];
+
+					}
+				}
+			});
+		}
+
+	},
 	validate: function(frm){
 		if( frm.doc.sexo == "-")
 		{
 			frappe.msgprint("Debes seleccionar el sexo")
 			validate = false
 			return
-		}	
+		}
 
 	},
 	telefono:function(frm){
-        frappe.model.set_value(frm.doctype,frm.docname, "telefono",mask_phone(frm.doc.telefono));
-    },
+		frappe.model.set_value(frm.doctype,frm.docname, "telefono",mask_phone(frm.doc.telefono));
+	},
 	nombre:function(frm){
 		var name=frm.doc.nombre.trim();	
 		
@@ -96,9 +122,9 @@ frappe.ui.form.on('Paciente', {
 			}]
 
 			var onsubmit = function(values){
-    			
-    			var days = frappe.datetime.get_diff(frappe.datetime.get_today(), values.fecha_nacimiento)
-    			cur_frm.set_value("edad",parseInt(days/365))
+				
+				var days = frappe.datetime.get_diff(frappe.datetime.get_today(), values.fecha_nacimiento)
+				cur_frm.set_value("edad",parseInt(days/365))
 			}
  
 			frappe.prompt(fields,onsubmit,'Calcular Edad del Paciente','Calcular')
@@ -113,16 +139,16 @@ frappe.ui.form.on('Paciente', {
 
 function mask_phone(phone)
 {
-        var pattern =new RegExp("((^[0-9]{3})[0-9]{3}[0-9]{4})$");
-        var pattern1 =new RegExp("([(][0-9]{3}[)] [0-9]{3}-[0-9]{4})$");
-        var pattern2 =new RegExp("([(][0-9]{3}[)][0-9]{3}-[0-9]{4})$");
+		var pattern =new RegExp("((^[0-9]{3})[0-9]{3}[0-9]{4})$");
+		var pattern1 =new RegExp("([(][0-9]{3}[)] [0-9]{3}-[0-9]{4})$");
+		var pattern2 =new RegExp("([(][0-9]{3}[)][0-9]{3}-[0-9]{4})$");
 
-        if(pattern.test(phone))
-                return ("({0}{1}{2}) {3}{4}{5}-{6}{7}{8}{9}".format(phone));
-        else if(pattern1.test(phone))
-                return phone;
-        else if(pattern2.test(phone))
-                return ("{0}{1}{2}{3}{4} {5}{6}{7}{8}{9}{10}{11}{12}".format(phone));
+		if(pattern.test(phone))
+				return ("({0}{1}{2}) {3}{4}{5}-{6}{7}{8}{9}".format(phone));
+		else if(pattern1.test(phone))
+				return phone;
+		else if(pattern2.test(phone))
+				return ("{0}{1}{2}{3}{4} {5}{6}{7}{8}{9}{10}{11}{12}".format(phone));
 
 
 }

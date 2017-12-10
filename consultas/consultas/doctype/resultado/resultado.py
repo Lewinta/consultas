@@ -129,12 +129,75 @@ class Resultado(Document):
 			for row in self.inmunodiagnosticos:
 				for tmp in temp:
 					if row.prueba_name == tmp.prueba_name and row.metodo == tmp.metodo :
-						row.resultado = tmp.resultado
-		if self.test_inmunodiagnosticos:
-			return True
-		else:
-			return False
+						row.resultado = tmp.resultado		
 
+	def get_microbiologia(self):
+		temp = self.antibiogramas if hasattr(self,'antibiogramas') else 0.00 
+		temp1 = self.bacteriologia_vaginal if hasattr(self,'bacteriologia_vaginal') else 0.00 
+		result = frappe.db.sql("""SELECT prueba as prueba_name,prueba_nombre as prueba,uds,metodo,rango_referencia as rango_ref
+		FROM `tabIndice Prueba` 
+			WHERE prueba_name IN (select prueba from `viewPruebas En Consulta` WHERE parent='{0}') 
+			AND grupo = 'MICROBIOLOGIA'"""
+			.format(self.consulta), as_dict=True)
+
+		self.antibiogramas = []
+		self.test_microbiologia = 1 if result else 0 
+		for prueba in result:
+			if prueba.prueba_name == "PRB-000000188":
+				self.tipo_cultivo = "SECRECION DE OIDO"
+
+			if prueba.prueba_name == "PRB-000000191":
+				self.tipo_cultivo = "SECRECION URETRAL"
+
+			if prueba.prueba_name == "PRB-000000192":
+				self.tipo_cultivo = "MATERIA FECAL"
+
+			if prueba.prueba_name == "PRB-000000194":
+				self.tipo_cultivo = "SECRECION DE OIDO"
+				
+			if prueba.prueba_name == "PRB-000000189":
+				self.append("bacteriologia_vaginal", {"valor": "BACTERIAS", "resultado": "", "interpretacion": "-"})	
+				self.append("bacteriologia_vaginal", {"valor": "CELULAS EPITELIALES", "resultado": "", "interpretacion": "-" })	
+				self.append("bacteriologia_vaginal", {"valor": "LEUCOCITOS", "resultado": "", "interpretacion": "-" })	
+				self.append("bacteriologia_vaginal", {"valor": "LEVADURAS", "resultado": "", "interpretacion": "-" })	
+				self.append("bacteriologia_vaginal", {"valor": "TRICHOMONAS", "resultado": "", "interpretacion": "-" })
+				self.tipo_cultivo = "SECRECION VAGINAL"
+			
+			self.append("antibiogramas", {"valor": "CIPROFLOXACIN", "resultado": "", "interpretacion": "-"})	
+			self.append("antibiogramas", {"valor": "BENZILPENCILLINS", "resultado": "", "interpretacion": "-" })	
+			self.append("antibiogramas", {"valor": "CLINDAMYCIN", "resultado": "", "interpretacion": "-" })	
+			self.append("antibiogramas", {"valor": "ERITROMICIN", "resultado": "", "interpretacion": "-" })	
+			self.append("antibiogramas", {"valor": "GENTAMICIN", "resultado": "", "interpretacion": "-" })
+			self.append("antibiogramas", {"valor": "LEVOFLOXACIN", "resultado": "", "interpretacion": "-" })
+			self.append("antibiogramas", {"valor": "LINEZOLID", "resultado": "", "interpretacion": "-" })
+			self.append("antibiogramas", {"valor": "MOXIFLOXACIN", "resultado": "", "interpretacion": "-" })
+			self.append("antibiogramas", {"valor": "NITROFURANTOIN", "resultado": "", "interpretacion": "-" })
+			self.append("antibiogramas", {"valor": "QUINUPRI/DALFOPRI", "resultado": "", "interpretacion": "-" })
+			self.append("antibiogramas", {"valor": "RIFAMPICIN", "resultado": "", "interpretacion": "-" })
+			self.append("antibiogramas", {"valor": "T. SULFA", "resultado": "", "interpretacion": "-" })
+			self.append("antibiogramas", {"valor": "TETRACYCLINE", "resultado": "", "interpretacion": "-" })
+			self.append("antibiogramas", {"valor": "TIGECICLINAS", "resultado": "", "interpretacion": "-" })
+			self.append("antibiogramas", {"valor": "VACOMYCIN", "resultado": "", "interpretacion": "-" })
+			self.append("antibiogramas", {"valor": "CEFOXITIN", "resultado": "", "interpretacion": "-" })
+
+
+		if temp and result:
+			for row in self.antibiogramas:
+				for tmp in temp:
+					if row.valor == tmp.valor :
+						row.resultado = tmp.resultado
+						row.interpretacion = tmp.interpretacion
+
+		if temp1 and result:
+			for row in self.bacteriologia_vaginal:
+				for tmp in temp:
+					if row.valor == tmp.valor :
+						row.resultado = tmp.resultado
+						row.interpretacion = tmp.interpretacion
+		
+
+		return True
+	
 
 	def get_hormonas(self):
 		temp = self.hormonas if hasattr(self,'hormonas') else 0.00 
@@ -165,8 +228,10 @@ class Resultado(Document):
 		as_dict=True)
 		
 		self.tipificacion = []
-		self.test_tipificacion = 1 if result else 0
-		self.test_inmunodiagnosticos = 1 if result else 0 
+		self.test_tipificacion = 1 if result else 0 
+		if self.test_tipificacion:
+			self.test_inmunodiagnosticos = 1
+
 		for prueba in result:
 			self.append("tipificacion",prueba)
 		if temp and result:
@@ -227,6 +292,8 @@ class Resultado(Document):
 		return True
 
 	def get_urianalisis(self):
+
+		self.test_urianalisis = 1 if self.has_urianalisis() else 0
 
 		temp = self.indices_urinarios if hasattr(self,'indices_urinarios') else 0.00 
 		self.indices_urinarios = []
@@ -317,6 +384,10 @@ class Resultado(Document):
 			self.test_anexos = show_anexos 
 
 		return True
+	def has_urianalisis(self):
+
+		tipo_cons = "Consulta Prueba Privada" if self.consulta_tipo == "Consulta Privada" else "Consulta Prueba"
+		return not not frappe.get_value(tipo_cons, {'parent':self.consulta, 'prueba':'PRB-000000229'})
 
 	def get_table_items(self):
 		self.refresh_personal_info()
@@ -329,3 +400,4 @@ class Resultado(Document):
 		self.get_urianalisis()
 		self.get_coprologia()
 		self.get_anexos()
+		self.get_microbiologia()

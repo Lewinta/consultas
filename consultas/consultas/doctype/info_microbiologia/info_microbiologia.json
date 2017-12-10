@@ -13,6 +13,7 @@
  "engine": "InnoDB", 
  "fields": [
   {
+   "allow_bulk_edit": 0, 
    "allow_on_submit": 0, 
    "bold": 0, 
    "collapsible": 0, 
@@ -42,6 +43,7 @@
    "unique": 0
   }, 
   {
+   "allow_bulk_edit": 0, 
    "allow_on_submit": 0, 
    "bold": 0, 
    "collapsible": 0, 
@@ -71,6 +73,7 @@
    "unique": 0
   }, 
   {
+   "allow_bulk_edit": 0, 
    "allow_on_submit": 0, 
    "bold": 0, 
    "collapsible": 0, 
@@ -100,6 +103,7 @@
    "unique": 0
   }, 
   {
+   "allow_bulk_edit": 0, 
    "allow_on_submit": 0, 
    "bold": 0, 
    "collapsible": 0, 
@@ -116,7 +120,7 @@
    "label": "Interpretacion", 
    "length": 0, 
    "no_copy": 0, 
-   "options": "SENSIBLE\nINTERMEDIO\nRESISTENTE", 
+   "options": "    \n-\nSENSIBLE\nINTERMEDIO\nRESISTENTE\n", 
    "permlevel": 0, 
    "precision": "", 
    "print_hide": 0, 
@@ -140,8 +144,8 @@
  "issingle": 0, 
  "istable": 1, 
  "max_attachments": 0, 
- "modified": "2017-07-10 15:58:38.892269", 
- "modified_by": "lewin.villar@gmail.com", 
+ "modified": "2017-12-09 16:57:40.172896", 
+ "modified_by": "Administrator", 
  "module": "Consultas", 
  "name": "Info_Microbiologia", 
  "name_case": "", 
