@@ -4,7 +4,7 @@
 frappe.ui.form.on('Paciente', {
 	
 	refresh: function(frm) {
-		frappe.model.set_value(frm.doctype,frm.docname,"responsable",frappe.session.user);
+		//frappe.model.set_value(frm.doctype,frm.docname,"responsable",frappe.session.user);
 		frm.trigger("add_toolbar_buttons")	
 	},
 	after_save: function(frm) {

@@ -17,13 +17,15 @@ frappe.ui.form.on('Resultado', {
 
         })
 
+        frm.add_fetch("consulta", "paciente", "paciente")
     },
     organismo: function(frm) {
         frm.set_value("organismo", frm.doc.organismo.toUpperCase())
     },
     refresh: function(frm) {
         //refresh_modules(frm);
-
+        frm.add_fetch("consulta", "medico", "medico");
+        frm.add_fetch("consulta", "institucion", "institucion")
         if(frm.doc.docstatus == 0)
             frm.trigger("add_toolbar_buttons")
 
@@ -54,25 +56,15 @@ frappe.ui.form.on('Resultado', {
         }, 1000);
 
    },
-    consulta: function(frm) {
+    paciente: function(frm) {
 
+
+      
         if (frm.doc.consulta) {
-            frappe.call({
-                "method": "frappe.client.get",
-                args: {
-                    doctype: "Paciente",
-                    name: frm.doc.paciente
-                },
-                callback: function(data) {
-                    frappe.model.set_value(frm.doctype,frm.docname,"cedula_pasaporte",data.message.cedula_pasaporte?data.message.cedula_pasaporte:"-");
-					frappe.model.set_value(frm.doctype,frm.docname,"sexo",data.message.sexo);
-					frappe.model.set_value(frm.doctype,frm.docname,"edad",data.message.edad);
-					frappe.model.set_value(frm.doctype,frm.docname,"direccion",data.message.direccion?data.message.direccion:"-");
-					frappe.model.set_value(frm.doctype,frm.docname,"telefono",data.message.telefono?data.message.telefono:"-");
+            let fields = ["cedula_pasaporte", "sexo", "edad", "telefono"]
+            frappe.db.get_value("Paciente", frm.doc.paciente, fields)
+                .done((data) => $.each(data.message, (key, value) => frm.set_value(key, value || "-")));
 
-			   }
-            });
-            
             var _method = "get_table_items"
             var _args = "get_table_items"
 
@@ -129,6 +121,8 @@ frappe.ui.form.on('Resultado', {
             frappe.call({"method": "get_quimica", "doc": frm.doc, callback:function(response){
                 if(response.message){
                     refresh_field("indices_pruebas")
+                    //frm.refresh()
+                    frm.dirty()
                     frappe.show_alert("Quimica Actualizada!",5);
                 }
 
@@ -201,8 +195,8 @@ frappe.ui.form.on('Resultado', {
         var coprologia = function(){
             frappe.call({"method": "get_coprologia", "doc": frm.doc, callback:function(response){
                 if(response.message){
-                    refresh_field("aspecto_fisico")
-                    refresh_field("aspecto_microscopico")
+                    frm.refresh()
+                    frm.dirty()
                     set_events()
                     frappe.show_alert("Coprologia Actualizada!",5);
                 }
@@ -213,6 +207,7 @@ frappe.ui.form.on('Resultado', {
         var anexos = function(){
             frappe.call({"method": "get_anexos", "doc": frm.doc, callback:function(response){
                 if(response.message){
+                    frm.refresh()
                     refresh_anexos(frm)
                     frappe.show_alert("Anexos Actualizado!",5);
                 }

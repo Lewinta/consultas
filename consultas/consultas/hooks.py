@@ -46,6 +46,7 @@ app_include_js = [
 # web_include_css = "/assets/consultas/css/consultas.css"
 # web_include_js = "/assets/consultas/js/consultas.js"
 
+
 # Home Pages
 # ----------
 
