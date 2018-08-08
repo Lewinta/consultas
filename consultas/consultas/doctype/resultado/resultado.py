@@ -27,10 +27,13 @@ class Resultado(Document):
 	# 			#"examen_fisicoquimico":""
 				
 	# 		})
+	def get_consult_table(self):
+		return "tabConsulta Prueba Privada" if self.consulta_tipo == "Consulta Privada" else "tabConsulta Prueba"
+
 	def refresh_personal_info(self):
 		paciente=frappe.get_doc("Paciente",self.paciente)
 		if(paciente):
-			medico = frappe.get_value("Consulta Privada",self.consulta,"medico")
+			consulta = frappe.get_doc(self.consulta_tipo, self.consulta)
 			nombre_completo = frappe.get_value("Paciente",self.paciente,"nombre_completo")
 			self.edad = paciente.edad
 			self.sexo = paciente.sexo
@@ -38,10 +41,41 @@ class Resultado(Document):
 			self.cedula_pasaporte = paciente.cedula_pasaporte if paciente.cedula_pasaporte else "-"
 			self.direccion = paciente.direccion if paciente.direccion else "-"			
 			self.nombre_completo = nombre_completo			
-			if medico:			
-				self.medico = medico 
-		return True
+			if consulta.medico:			
+				self.medico = consulta.medico 
+			if consulta.institucion:			
+				self.institucion = consulta.institucion 
 
+		return True
+	def assign_result_to_consult(self):	
+		# Remove Resultado to Consulta Privada
+		cp = frappe.get_doc(self.consulta_tipo, self.consulta)
+		cp.resultado = ""
+		cp.db_update()
+
+	def on_cancel(self):
+		self.assign_result_to_consult()
+
+	def on_trash(self):
+		self.assign_result_to_consult()
+
+	def after_insert(self):
+		# Assign Resultado to Consulta Privada
+		cp = frappe.get_doc(self.consulta_tipo, self.consulta)
+		cp.resultado = self.name
+		cp.db_update()
+
+		self.key = self.get_signature()
+
+		self.print_url = "{url}/{doctype}/{name}?key={key}".format(**{
+			"url": frappe.utils.get_url(),
+			"doctype": self.doctype,
+			"name": self.name,
+			"key": self.key
+		})
+
+		self.db_update()
+		
 	def before_insert(self):
 		result = frappe.db.sql("""SELECT CONCAT('RES-',LPAD(current+1,10,0)) as name FROM `tabSeries` WHERE name = 'RES-'""",as_dict=True)
 		name = result[0].name
@@ -54,11 +88,21 @@ class Resultado(Document):
 
 		temp = self.indices_pruebas if hasattr(self,'indices_pruebas') else 0.00 
 
-		result = frappe.db.sql("""SELECT prueba as name,prueba_nombre as prueba,uds,metodo,rango_referencia as rango_ref
-		FROM `tabIndice Prueba` 
-			WHERE prueba_name IN (select prueba from `viewPruebas En Consulta` WHERE parent='{0}') AND grupo = 'QUIMICA'"""
-			.format(self.consulta),
+		result = frappe.db.sql("""SELECT C.prueba AS name, I.prueba_nombre AS prueba, I.uds, I.metodo, I.rango_referencia AS rango_ref
+			FROM 
+				`tabIndice Prueba` I JOIN `{0}` C 
+			ON 
+				I.prueba = C.prueba 
+			WHERE 
+				C.parent = '{1}' AND I.grupo = 'QUIMICA'"""
+			.format(self.get_consult_table(), self.consulta),
 		as_dict=True)
+		
+		# result = frappe.db.sql("""SELECT prueba as name,prueba_nombre as prueba,uds,metodo,rango_referencia as rango_ref
+		# FROM `tabIndice Prueba` 
+		# 	WHERE prueba_name IN (select prueba from `{0}` WHERE parent='{0}') AND grupo = 'QUIMICA'"""
+		# 	.format(self.consulta),
+		# as_dict=True)
 		
 		self.indices_pruebas = []
 		self.test_quimicos = 1 if result else 0
@@ -74,6 +118,11 @@ class Resultado(Document):
 				self.append("indices_pruebas",{"prueba":"GLOBULINA","metodo":"QLM","rango_ref":"2.0 - 4.0","uds":"MG/DL"})
 				self.append("indices_pruebas",{"prueba":"INDICE A/G","metodo":"QLM","rango_ref":"1.2 - 2.2","uds":"MG/DL"})
 				continue
+			if prueba.name == "PRB-000000271":
+				self.append("indices_pruebas",{"prueba":"HIERRO TOTAL","metodo":"  ","rango_ref":"50 - 212","uds":"ug/DL"})
+				self.append("indices_pruebas",{"prueba":"T I B C","metodo":"  ","rango_ref":"205 - 567","uds":"ug/DL"})
+				self.append("indices_pruebas",{"prueba":"% de Saturation","metodo":"  ","rango_ref":"24.3 - 37.4","uds":"%"})
+				continue
 			# self.append("indices_pruebas",prueba)
 			self.append("indices_pruebas",{"prueba":prueba.prueba,"metodo":prueba.metodo,"rango_ref":prueba.rango_ref,"uds":prueba.uds})
 		if temp and result:
@@ -85,14 +134,18 @@ class Resultado(Document):
 
 	def get_serologia(self):
 		temp = self.serologia  if hasattr(self,'serologia') else 0.00 
-		result = frappe.db.sql("""SELECT name as prueba,prueba_nombre,uds,metodo,rango_referencia as rango_ref
-		FROM `tabIndice Prueba` 
-			WHERE prueba_name IN (select prueba from `viewPruebas En Consulta` WHERE parent='{0}') AND grupo = 'SEROLOGIA'"""
-			.format(self.consulta),
+		result = frappe.db.sql("""SELECT C.prueba AS name, I.prueba_nombre AS prueba, I.uds, I.metodo, I.rango_referencia AS rango_ref
+			FROM 
+				`tabIndice Prueba` I JOIN `{0}` C 
+			ON 
+				I.prueba = C.prueba 
+			WHERE 
+				C.parent = '{1}' AND I.grupo = 'SEROLOGIA'"""
+			.format(self.get_consult_table(), self.consulta),
 		as_dict=True)
 		
 		self.serologia = []
-		self.test_quimicos = 1 if result else 0
+		self.test_serologia = 1 if result else 0
 		for prueba in result:
 			self.append("serologia",prueba)
 
@@ -105,47 +158,147 @@ class Resultado(Document):
 
 	def get_inmunodiagnostico(self):
 		temp = self.inmunodiagnosticos if hasattr(self,'inmunodiagnosticos') else 0.00 
-		result = frappe.db.sql("""SELECT prueba as prueba_name,prueba_nombre as prueba,uds,metodo,rango_referencia as rango_ref
-		FROM `tabIndice Prueba` 
-			WHERE prueba_name IN (select prueba from `viewPruebas En Consulta` WHERE parent='{0}') 
-			AND grupo = 'INMUNODIAGNOSTICOS'
-			AND prueba <>'PRB-000000224'"""
-			.format(self.consulta),
+		result = frappe.db.sql("""SELECT C.prueba AS name, I.prueba_nombre AS prueba, I.uds, I.metodo, I.rango_referencia AS rango_ref
+			FROM 
+				`tabIndice Prueba` I JOIN `{0}` C 
+			ON 
+				I.prueba = C.prueba 
+			WHERE 
+				C.parent = '{1}' AND I.grupo = 'INMUNODIAGNOSTICOS'
+			AND C.prueba <>'PRB-000000224'"""
+			.format(self.get_consult_table(), self.consulta),
 		as_dict=True)
 		self.inmunodiagnosticos = []
 		self.test_inmunodiagnosticos = 1 if result else 0 
 		for prueba in result:
-			self.append("inmunodiagnosticos",prueba)
-			if prueba.prueba_name == "PRB-000000059":
+
+			if prueba.name == "PRB-000000270":
+				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba": "CHLAMYDIA TRACHOMATIS", "metodo": " ", "rango_ref": " ", "uds": "ANEXOS"})	
+				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba": "NEISSERIA GONORRHOEAE", "metodo": " ", "rango_ref": " " , "uds": "ANEXOS"})	
+				continue 
+
+			if prueba.name == "PRB-000000048":
+				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba":"PSA TOTAL", "metodo": "QLM", "rango_ref": "0 - 4.0", "uds": "ng/ml"})	
+				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba":"PSA LIBRE", "metodo": "QLM", "rango_ref": "-", "uds": "ng/ml"})	
+				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba":"% PSA LIBRE/PSA TOTAL", "metodo": "QLM", "rango_ref": "> 11.0", "uds": "ng/ml"})	
+				continue 
+
+			if prueba.name == "PRB-000000059":
 				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba": " ", "metodo": "CONTROL", "rango_ref": "          ", "uds": "SEGUNDOS"})	
 				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba": " ", "metodo": "INR"    , "rango_ref": "0.9 - 1.2" , "uds": "SEGUNDOS"})	
 				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba": " ", "metodo": "%"      , "rango_ref": "70 - 120"," uds":"%"})	
+				continue 
 
-			if prueba.prueba_name == "PRB-000000060":
-				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba":" ", "metodo": "CONTROL", "rango_ref": "          ", "uds": "SEGUNDOS"})	
+			if prueba.name == "PRB-000000060":
+				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba":" ", "metodo": "CONTROL", "rango_ref": "          ", "uds": "SEGUNDOS"})
+				continue 
 
-			if prueba.prueba_name == "PRB-000000095":
+			if prueba.name == "PRB-000000095":
 				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba":"SALMONELLA TYPHI O", "metodo": " ", "rango_ref": "          ", "uds": " "})	
 				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba":"SALMONELLA TYPHI H", "metodo": " ", "rango_ref": "          ", "uds": " "})	
 				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba":"PARATYPHI B(O)", "metodo": " ", "rango_ref": "          ", "uds": " "})	
 				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba":"PARATYPHI B(H)", "metodo": " ", "rango_ref": "          ", "uds": " "})	
 				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba":"BRUCELLAS ABORTUS", "metodo": " ", "rango_ref": "          ", "uds": " "})	
 				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba":"PROTEUS O-X-19", "metodo": " ", "rango_ref": "          ", "uds": " "})
+				continue 
+			
+			self.append("inmunodiagnosticos",prueba)
 
-		if temp and result:
-			for row in self.inmunodiagnosticos:
-				for tmp in temp:
-					if row.prueba_name == tmp.prueba_name and row.metodo == tmp.metodo :
-						row.resultado = tmp.resultado		
+	def get_espermatograma(self):
+		temp_examen_macroscopico = self.examen_macroscopico if hasattr(self,'examen_macroscopico') else 0.00 
+		temp_examen_microscopico = self.examen_microscopico if hasattr(self,'examen_microscopico') else 0.00 
+		temp_evaluacion_mortalidad = self.evaluacion_mortalidad if hasattr(self,'evaluacion_mortalidad') else 0.00 
+		temp_concentracion = self.concentracion if hasattr(self,'concentracion') else 0.00 
+		temp_morfologia_espermatica = self.morfologia_espermatica if hasattr(self,'morfologia_espermatica') else 0.00 
+		result = frappe.db.sql("""SELECT prueba  from `{0}` WHERE parent='{0}' AND prueba  = 'PRB-000000268'"""
+			.format(self.get_consult_table(), self.consulta), as_dict=True)
+		
+		self.examen_macroscopico = []
+		self.examen_microscopico = []
+		self.evaluacion_mortalidad = []
+		self.concentracion = []
+		self.morfologia_espermatica = []
+		self.test_espermatograma = 1 if result else 0
+		
+
+		self.append("examen_macroscopico",{"descripcion": "TIEMPO DE LICUEFACCIÓN", "rango_ref":"< 60 MIN ", "resultado":"", "uds": "MINUTOS"})
+		self.append("examen_macroscopico",{"descripcion": "ASPECTO", "rango_ref":"Hom/Opa", "resultado":"", "uds": "-"})
+		self.append("examen_macroscopico",{"descripcion": "COLOR", "rango_ref":"GRIS OPALESCENTE", "resultado":"", "uds": "-"})
+		self.append("examen_macroscopico",{"descripcion": "VOLUMEN", "rango_ref":">= 2 mL", "resultado":"", "uds": "ML"})
+		self.append("examen_macroscopico",{"descripcion": "VISCOSIDAD", "rango_ref":"Normal Fil < 2cm", "resultado":"", "uds": ""})
+		self.append("examen_macroscopico",{"descripcion": "PH", "rango_ref":"> 7.2", "resultado":"", "uds": ""})
+
+		self.append("examen_microscopico",{"descripcion": "GLOBULOS BLANCOS", "rango_ref":"-", "resultado":"", "uds": "/CAMPO"})
+		self.append("examen_microscopico",{"descripcion": "GLOBULOS ROJOS", "rango_ref":"-", "resultado":"", "uds": "/CAMPO"})
+		self.append("examen_microscopico",{"descripcion": "CELULAS EPITELIALES", "rango_ref":"-", "resultado":"", "uds": "/CAMPO"})
+		self.append("examen_microscopico",{"descripcion": "CELULAS GERMINALES INMADURAS", "rango_ref":"-", "resultado":"", "uds": "/CAMPO"})
+		self.append("examen_microscopico",{"descripcion": "LEVADURAS", "rango_ref":"-", "resultado":"", "uds": " "})
+		self.append("examen_microscopico",{"descripcion": "TRICHOMONAS", "rango_ref":"-", "resultado":"", "uds": " "})
+		self.append("examen_microscopico",{"descripcion": "BACTERIAS", "rango_ref":"-", "resultado":"", "uds": " "})
+		self.append("examen_microscopico",{"descripcion": "AGLUTINACION", "rango_ref":"-", "resultado":"", "uds": " "})
+
+		self.append("evaluacion_mortalidad",{"descripcion": "A) PROGRESIVA RAPIDA", "rango_ref":"-", "resultado":"", "uds": "%"})
+		self.append("evaluacion_mortalidad",{"descripcion": "B) PROGRESIVA LENTA", "rango_ref":"-", "resultado":"", "uds": "%"})
+		self.append("evaluacion_mortalidad",{"descripcion": "C) NO PROGRESIVA", "rango_ref":"-", "resultado":"", "uds": "%"})
+		self.append("evaluacion_mortalidad",{"descripcion": "D) INMOVILES", "rango_ref":"-", "resultado":"", "uds": "%"})
+		self.append("evaluacion_mortalidad",{"descripcion": "ESPERMATOZOIDES MOVILES: A+B+C", "rango_ref":"-", "resultado":"", "uds": "%"})
+		self.append("evaluacion_mortalidad",{"descripcion": "ESPERMATOZOIDES PROGRESIVOS: A+B", "rango_ref":"> 50%", "resultado":"", "uds": "%"})
+		self.append("evaluacion_mortalidad",{"descripcion": "ESPERMATOZOIDES VIVOS", "rango_ref":"> 50%", "resultado":"", "uds": "%"})
+
+		self.append("concentracion",{"descripcion": "ESPERMATOZOIDES/mL", "rango_ref":"-", "resultado":"", "uds": "Mill/mL"})
+		self.append("concentracion",{"descripcion": "ESPERMATOZOIDES/eyaculados", "rango_ref":"-", "resultado":"", "uds": "Mill/mL"})
+
+		self.append("morfologia_espermatica",{"descripcion": "NORMALES", "rango_ref":"-", "resultado":"", "uds": "%"})
+		self.append("morfologia_espermatica",{"descripcion": "ANORMALES", "rango_ref":"-", "resultado":"", "uds": "%"})
+		self.append("morfologia_espermatica",{"descripcion": "DEFECTOS DE CABEZA", "rango_ref":"-", "resultado":"", "uds": "%"})
+		self.append("morfologia_espermatica",{"descripcion": "DEFECTOS DE CUELLO Y PIEZA MEDIA", "rango_ref":"-", "resultado":"", "uds": "%"})
+		self.append("morfologia_espermatica",{"descripcion": "DEFECTOS DE COLA", "rango_ref":"-", "resultado":"", "uds": "%"})
+		self.append("morfologia_espermatica",{"descripcion": "DEFECTOS DE COLA CITOPLASMÁTICA", "rango_ref":"-", "resultado":"", "uds": "%"})
+
+		if temp_examen_macroscopico and result:
+			for row in self.examen_macroscopico:
+				for tmp in temp_examen_macroscopico:
+					if row.descripcion == tmp.descripcion:
+						row.resultado = tmp.resultado
+
+		if temp_examen_microscopico and result:
+			for row in self.examen_microscopico:
+				for tmp in temp_examen_microscopico:
+					if row.descripcion == tmp.descripcion:
+						row.resultado = tmp.resultado
+
+		if temp_evaluacion_mortalidad and result:
+			for row in self.evaluacion_mortalidad:
+				for tmp in temp_evaluacion_mortalidad:
+					if row.descripcion == tmp.descripcion:
+						row.resultado = tmp.resultado
+
+		if temp_concentracion and result:
+			for row in self.concentracion:
+				for tmp in temp_concentracion:
+					if row.descripcion == tmp.descripcion:
+						row.resultado = tmp.resultado
+
+		if temp_morfologia_espermatica and result:
+			for row in self.morfologia_espermatica:
+				for tmp in temp_morfologia_espermatica:
+					if row.descripcion == tmp.descripcion:
+						row.resultado = tmp.resultado
+
+		return True 
+		
 
 	def get_microbiologia(self):
 		temp = self.antibiogramas if hasattr(self,'antibiogramas') else 0.00 
 		temp1 = self.bacteriologia_vaginal if hasattr(self,'bacteriologia_vaginal') else 0.00 
-		result = frappe.db.sql("""SELECT prueba as prueba_name,prueba_nombre as prueba,uds,metodo,rango_referencia as rango_ref
-		FROM `tabIndice Prueba` 
-			WHERE prueba_name IN (select prueba from `viewPruebas En Consulta` WHERE parent='{0}') 
-			AND grupo = 'MICROBIOLOGIA'"""
-			.format(self.consulta), as_dict=True)
+		result = frappe.db.sql("""SELECT C.prueba AS name, I.prueba_nombre AS prueba, I.uds, I.metodo, I.rango_referencia AS rango_ref
+			FROM 
+				`tabIndice Prueba` I JOIN `{0}` C 
+			ON 
+				I.prueba = C.prueba 
+			WHERE 
+				C.parent = '{1}' AND I.grupo  = 'MICROBIOLOGIA'"""
+			.format(self.get_consult_table(), self.consulta), as_dict=True)
 
 		self.antibiogramas = []
 		self.test_microbiologia = 1 if result else 0 
@@ -166,9 +319,12 @@ class Resultado(Document):
 				self.tipo_cultivo = "ESPUTO"
 				self.tipo_microbiologia = "BACILOSCOPIA"
 
-
 			if prueba.prueba_name == "PRB-000000192":
 				self.tipo_cultivo = "MATERIA FECAL"
+
+			if prueba.prueba_name == "PRB-000000267":
+				self.tipo_cultivo = "SEMEN"
+				return 0
 
 			if prueba.prueba_name == "PRB-000000194":
 				self.tipo_cultivo = "SECRECION DE OIDO"
@@ -180,7 +336,7 @@ class Resultado(Document):
 				self.append("bacteriologia_vaginal", {"valor": "LEVADURAS", "resultado": "", "interpretacion": "-" })	
 				self.append("bacteriologia_vaginal", {"valor": "TRICHOMONAS", "resultado": "", "interpretacion": "-" })
 				self.tipo_cultivo = "SECRECION VAGINAL"
-			
+
 			self.append("antibiogramas", {"valor": "CIPROFLOXACIN", "resultado": "", "interpretacion": "-"})	
 			self.append("antibiogramas", {"valor": "BENZILPENCILLINS", "resultado": "", "interpretacion": "-" })	
 			self.append("antibiogramas", {"valor": "CLINDAMYCIN", "resultado": "", "interpretacion": "-" })	
@@ -219,10 +375,14 @@ class Resultado(Document):
 
 	def get_hormonas(self):
 		temp = self.hormonas if hasattr(self,'hormonas') else 0.00 
-		result = frappe.db.sql("""SELECT name as prueba,prueba_nombre,uds,metodo,rango_referencia as rango_ref
-		FROM `tabIndice Prueba` 
-			WHERE prueba_name IN (select prueba from `viewPruebas En Consulta` WHERE parent='{0}') AND grupo = 'HORMONAS'"""
-			.format(self.consulta),
+		result = frappe.db.sql("""SELECT C.prueba AS name, I.prueba_nombre AS prueba, I.uds, I.metodo, I.rango_referencia AS rango_ref
+			FROM 
+				`tabIndice Prueba` I JOIN `{0}` C 
+			ON 
+				I.prueba = C.prueba 
+			WHERE 
+				C.parent = '{1}' AND I.grupo  = 'HORMONAS'"""
+			.format(self.get_consult_table(), self.consulta),
 		as_dict=True)
 		
 		self.hormonas = []
@@ -238,11 +398,14 @@ class Resultado(Document):
 
 	def get_tipificacion(self):
 		temp = self.tipificacion if hasattr(self,'tipificacion') else 0.00 
-		result = frappe.db.sql("""SELECT name as prueba,prueba_nombre,uds,metodo,rango_referencia as rango_ref
-		FROM `tabIndice Prueba` 
-			WHERE prueba_name IN (select prueba from `viewPruebas En Consulta` WHERE parent='{0}') 
-			AND  grupo = 'INMUNODIAGNOSTICOS' AND prueba = 'PRB-000000224' """  
-			.format(self.consulta),
+		result = frappe.db.sql("""SELECT C.prueba AS name, I.prueba_nombre AS prueba, I.uds, I.metodo, I.rango_referencia AS rango_ref
+			FROM 
+				`tabIndice Prueba` I JOIN `{0}` C 
+			ON 
+				I.prueba = C.prueba 
+			WHERE 
+				C.parent = '{1}' AND I.grupo = 'INMUNODIAGNOSTICOS' AND C.prueba = 'PRB-000000224' """  
+			.format(self.get_consult_table(), self.consulta),
 		as_dict=True)
 		
 		self.tipificacion = []
@@ -261,8 +424,8 @@ class Resultado(Document):
 
 	def get_hematologia(self):
 		temp = self.indices_hematologicos if hasattr(self,'indices_hematologicos') else 0.00 
-		result = frappe.db.sql("""SELECT prueba from `viewPruebas En Consulta` WHERE parent='{0}' AND prueba in ('PRB-000000195') """  
-			.format(self.consulta),
+		result = frappe.db.sql("""SELECT prueba from `{0}` WHERE parent='{1}' AND prueba in ('PRB-000000195') """  
+			.format(self.get_consult_table(), self.consulta),
 		as_dict=True)
 
 		self.indices_hematologicos = []
@@ -351,8 +514,8 @@ class Resultado(Document):
 		self.aspecto_fisico = []
 		filters = {"disponible": 1, "coprologico":1, "tipo_indice":"Aspecto Fisico"}
 		result = frappe.get_list("Indice Urinario", filters,["nombre"],order_by="creation ASC",limit_page_length=0)
-		tiene_copro = frappe.db.sql("""SELECT prueba from `viewPruebas En Consulta` WHERE parent='{0}' AND prueba = 'PRB-000000144' """  
-			.format(self.consulta), as_dict=True)
+		tiene_copro = frappe.db.sql("""SELECT prueba from `{0}` WHERE parent='{1}' AND prueba = 'PRB-000000144' """  
+			.format(self.get_consult_table(), self.consulta), as_dict=True)
 		 
 		self.test_coprologico = 1 if result and tiene_copro else 0	
 		for indice in result:
@@ -427,3 +590,4 @@ class Resultado(Document):
 		self.get_coprologia()
 		self.get_anexos()
 		self.get_microbiologia()
+		self.get_espermatograma()

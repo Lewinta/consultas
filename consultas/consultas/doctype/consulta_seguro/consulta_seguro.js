@@ -16,6 +16,7 @@ frappe.ui.form.on('Consulta Seguro',
     },
     refresh: function(frm){
     	//	frm.trigger("add_toolbar_buttons")
+    	frm.add_fetch("paciente", "edad", "edad");
     },
 	paciente:function(frm)
 	{

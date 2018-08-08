@@ -18,6 +18,8 @@ frappe.ui.form.on('Resultado', {
         })
 
         frm.add_fetch("consulta", "paciente", "paciente")
+        frm.add_fetch("consulta", "edad", "edad")
+        frm.add_fetch("consulta", "sucursal", "sucursal")
     },
     organismo: function(frm) {
         frm.set_value("organismo", frm.doc.organismo.toUpperCase())
@@ -29,21 +31,14 @@ frappe.ui.form.on('Resultado', {
         if(frm.doc.docstatus == 0)
             frm.trigger("add_toolbar_buttons")
 
-        cur_frm.set_query("consulta", function() {
-            return {
-                "filters": {
-                    "docstatus": 1,
-                    "resultado": "0"
-                }
-            }
-        });
+        frm.trigger("consulta_tipo")
     },
     consulta_tipo: function(frm) {
         cur_frm.set_query("consulta", function() {
             return {
                 "filters": {
-                    "docstatus": 1,
-                    "resultado": "0"
+                    // "docstatus": 1,
+                    "resultado": ""
                 }
             }
         });
@@ -55,6 +50,27 @@ frappe.ui.form.on('Resultado', {
             //}
         }, 1000);
 
+   },
+   tiene_parasitos: function(frm){
+    frm.set_value("parasitos", frm.doc.tiene_parasitos ? "":"NO SE OBSERVAN ELEMENTOS PARASITARIOS EN ESTA MUESTRA.")
+
+   },
+   tiene_amebas: function(frm){
+    frm.set_value("amebas", frm.doc.tiene_amebas ? "":"NO SE OBSERVAN EN ESTA MUESTRA.")
+
+   },
+   tiene_giardia: function(frm){
+    frm.set_value("giardia", frm.doc.tiene_giardia ? "":"NO SE OBSERVAN EN ESTA MUESTRA.")
+
+   },
+   parasitos: function(frm){
+    frm.set_value("parasitos", frm.doc.parasitos.toUpperCase())
+   },
+   amebas: function(frm){
+    frm.set_value("amebas", frm.doc.amebas.toUpperCase())
+   },
+   giardia: function(frm){
+    frm.set_value("giardia", frm.doc.giardia.toUpperCase())
    },
     paciente: function(frm) {
 
@@ -109,8 +125,7 @@ frappe.ui.form.on('Resultado', {
         var hematologia = function(){
             frappe.call({"method": "get_hematologia", "doc": frm.doc, callback:function(response){
                 if(response.message){
-                    refresh_field("indices_hematologicos")
-                    refresh_field("otros_hematologia")
+                    frm.refresh();
                     frappe.show_alert("Hematologia Actualizado!",5);
                 }
 
@@ -121,7 +136,7 @@ frappe.ui.form.on('Resultado', {
             frappe.call({"method": "get_quimica", "doc": frm.doc, callback:function(response){
                 if(response.message){
                     refresh_field("indices_pruebas")
-                    //frm.refresh()
+                    frm.refresh_fields("test_quimicos")
                     frm.dirty()
                     frappe.show_alert("Quimica Actualizada!",5);
                 }
@@ -133,6 +148,7 @@ frappe.ui.form.on('Resultado', {
             frappe.call({"method": "get_microbiologia", "doc": frm.doc, callback:function(response){
                 if(response.message){
                     refresh_field("antibiogramas")
+                    frm.refresh_fields("test_microbiologia")
                     frappe.show_alert("Microbiologia Actualizada!",5);
                 }
 
@@ -151,11 +167,14 @@ frappe.ui.form.on('Resultado', {
 
         var inmunodiagnosticos = function(){
             frappe.call({"method": "get_inmunodiagnostico", "doc": frm.doc, callback:function(response){
-                console.log('inmunodiagnosticos ' )
-                if(response.message){
-                    refresh_field("inmunodiagnosticos")
-                    frappe.show_alert("Inmunodiagnosticos Actualizados!",5);
-                }
+            
+                frappe.run_serially([
+                    frappe.dom.freeze(),
+                    frm.refresh(),
+                    response && response.message && console.log("Inmunodiagnosticos"),
+                    frappe.dom.unfreeze()
+                ]); 
+                frappe.show_alert("Inmunodiagnosticos Actualizados!",5);
 
             }});
         }
@@ -163,8 +182,8 @@ frappe.ui.form.on('Resultado', {
         var hormonas = function(){
             frappe.call({"method": "get_hormonas", "doc": frm.doc, callback:function(response){
                 if(response.message){
-                    refresh_field("hormonas")
                     frappe.show_alert("Hormonas Actualizadas!",5);
+                    frm.refresh();
                 }
 
             }});
@@ -173,8 +192,8 @@ frappe.ui.form.on('Resultado', {
         var tipificacion = function(){
             frappe.call({"method": "get_tipificacion", "doc": frm.doc, callback:function(response){
                 if(response.message){
-                    refresh_field("tipificacion")
                     frappe.show_alert("Tipificacion Actualizada!",5);
+                    frm.refresh();
                 }
 
             }});
@@ -186,6 +205,7 @@ frappe.ui.form.on('Resultado', {
                     refresh_field("indices_urinarios")
                     refresh_field("sedimentos_urinarios")
                     set_events()
+                    frm.refresh()
                     frappe.show_alert("Urianalisis Actualizado!",5);
                 }
 
@@ -215,6 +235,19 @@ frappe.ui.form.on('Resultado', {
             }});
         }
 
+        var espermatograma = function(){
+            frappe.call({"method": "get_espermatograma", "doc": frm.doc, callback:function(response){
+                if(response.message){
+                    frm.refresh()
+                    frm.refresh_fields("test_espermatograma")
+                    frm.refresh_fields("examen_macroscopico")
+                    frm.dirty()
+                    frappe.show_alert("Espermatograma Actualizado!",5);
+                }
+
+            }});
+        }
+
         frm.add_custom_button("Informacion Personal",personal_info,"Actualizar" )
         frm.add_custom_button("Hematologia",hematologia,"Actualizar" )
         frm.add_custom_button("Microbiologia",microbiologia,"Actualizar" )
@@ -225,6 +258,7 @@ frappe.ui.form.on('Resultado', {
         frm.add_custom_button("Tipificacion",tipificacion,"Actualizar" )
         frm.add_custom_button("Urianalisis",urianalisis,"Actualizar" )
         frm.add_custom_button("Coprologia",coprologia,"Actualizar" )
+        frm.add_custom_button("Espermatograma",espermatograma,"Actualizar" )
         frm.add_custom_button("Anexos",anexos,"Actualizar" )
     }
 });

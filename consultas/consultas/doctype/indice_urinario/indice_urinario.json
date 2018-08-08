@@ -2,7 +2,7 @@
  "allow_copy": 0, 
  "allow_guest_to_view": 0, 
  "allow_import": 0, 
- "allow_rename": 0, 
+ "allow_rename": 1, 
  "autoname": "field:nombre", 
  "beta": 0, 
  "creation": "2017-04-19 23:09:20.680484", 
@@ -14,6 +14,7 @@
  "engine": "InnoDB", 
  "fields": [
   {
+   "allow_bulk_edit": 0, 
    "allow_on_submit": 0, 
    "bold": 1, 
    "collapsible": 0, 
@@ -44,6 +45,7 @@
    "unique": 0
   }, 
   {
+   "allow_bulk_edit": 0, 
    "allow_on_submit": 0, 
    "bold": 1, 
    "collapsible": 0, 
@@ -73,6 +75,7 @@
    "unique": 0
   }, 
   {
+   "allow_bulk_edit": 0, 
    "allow_on_submit": 0, 
    "bold": 0, 
    "collapsible": 0, 
@@ -103,6 +106,7 @@
    "unique": 0
   }, 
   {
+   "allow_bulk_edit": 0, 
    "allow_on_submit": 0, 
    "bold": 0, 
    "collapsible": 0, 
@@ -133,6 +137,7 @@
    "unique": 0
   }, 
   {
+   "allow_bulk_edit": 0, 
    "allow_on_submit": 0, 
    "bold": 0, 
    "collapsible": 0, 
@@ -163,6 +168,7 @@
    "unique": 0
   }, 
   {
+   "allow_bulk_edit": 0, 
    "allow_on_submit": 0, 
    "bold": 0, 
    "collapsible": 0, 
@@ -191,6 +197,7 @@
    "unique": 0
   }, 
   {
+   "allow_bulk_edit": 0, 
    "allow_on_submit": 0, 
    "bold": 1, 
    "collapsible": 0, 
@@ -232,8 +239,8 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2017-07-07 19:55:46.257966", 
- "modified_by": "lewin.villar@gmail.com", 
+ "modified": "2018-07-21 14:41:42.360523", 
+ "modified_by": "Administrator", 
  "module": "Consultas", 
  "name": "Indice Urinario", 
  "name_case": "UPPER CASE", 

@@ -3,7 +3,7 @@
 frappe.ui.form.on('Consulta Privada', {
 	onload: function(frm) {
 		if (!frm.doc.__islocal) return;
-		frappe.model.set_value(frm.doctype, frm.docname, "fecha", new Date());
+		//frappe.model.set_value(frm.doctype, frm.docname, "fecha", new Date());
 		var callback = function(data) {
 			
 			frappe.model.get_value("Empresa",data.empresa, "nombre", function (data){

@@ -11,7 +11,7 @@ from frappe.model.naming import make_autoname
 class Paciente(Document):
 	
 	def before_insert(self):
-                self.id=make_autoname("PAC-.##########")
+		self.web_hash = frappe.generate_hash("Paciente",10)
 	# def save(self):
 	# 	#doc = frappe.get_doc("Paciente",self.id)
 	# 	#doc.name=self.nombre_completo
@@ -20,6 +20,7 @@ class Paciente(Document):
 	# 	#frappe.errprint("old {0} new {1}".format(self.name,self.nombre_completo))
 	# 	self.update()
 	# 	#print(self.name)
+
 @frappe.whitelist()
 def make_consulta(source_name,tipo_consulta ,target_doc = None):
 	consulta = get_mapped_doc("Paciente", source_name, {
