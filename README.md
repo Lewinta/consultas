@@ -10,3 +10,8 @@ MIT
 # Reclamaciones
 Reclamaciones para Betalab
 >>>>>>> ab458d76385d5dda236b3dbe3ffba1dd54be527c
+
+=======
+# Installation
+
+bench get-app consultas https://github.com/Lewinta/consultas.git
