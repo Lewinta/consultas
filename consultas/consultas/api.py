@@ -6,13 +6,21 @@ from frappe.utils import get_url
 def get_results(filters):
 	filters = frappe._dict(json.loads(filters))
 
-	return frappe.db.sql("""SELECT name, docstatus, fecha, paciente, print_url
+	return frappe.db.sql("""SELECT name, docstatus, fecha, paciente, institucion, print_url
 		FROM `tabResultado`
-		WHERE 1 = 1
-		%(conditions)s
+		WHERE docstatus != 2
+ 		%(conditions)s
 		ORDER BY fecha, paciente, docstatus""" % {
 			"conditions": get_conditions(filters)
 		}, as_dict=True, debug=True)
+
+@frappe.whitelist(allow_guest=True)
+def get_institutions():
+	return frappe.db.sql("""SELECT name
+		FROM `tabInstitucion`
+		WHERE pertenece_a_la_pagina = 1
+		ORDER BY name""", debug=False
+	)
 
 @frappe.whitelist(allow_guest=True)
 def get_print_url(name, print_format="Resultados Timbrados"):
@@ -57,3 +65,38 @@ def quitar_coprologico(docname):
 		print("removed coprologico")
 	doc.db_update()
 	frappe.db.commit()
+
+def get_rango_por_edad(indice_prueba, edad):
+	if not frappe.db.exists("Indice Prueba", indice_prueba):
+		return "not found"
+	# ip = frappe.get_value("Indice Prueba", {"prueba": prueba}, "name")
+
+	conditions = frappe.db.sql("""
+		SELECT
+			condicion,
+			edad_anos,
+			rango_de_referencia
+		FROM 
+			`tabRango por Edad`
+		WHERE
+			parent = %s
+		""", indice_prueba, as_dict=True)
+
+	for cond in conditions:
+		# print(cond.condicion)
+		if cond.condicion == "Menor":
+			frappe.errprint("{} {} < {}".format(cond.condicion, cond.edad_anos, edad))
+			if edad < cond.edad_anos :
+				return cond.rango_de_referencia
+
+		if cond.condicion == "Igual":
+			frappe.errprint("{} {} == {}".format(cond.condicion, cond.edad_anos, edad))
+			if edad == cond.edad_anos:
+				return cond.rango_de_referencia
+
+		if cond.condicion == "Mayor":
+			frappe.errprint("{} {} > {}".format(cond.condicion, cond.edad_anos, edad))
+			if edad > cond.edad_anos:
+				return cond.rango_de_referencia
+	
+	return " - "

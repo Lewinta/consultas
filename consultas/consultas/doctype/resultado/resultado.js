@@ -21,6 +21,50 @@ frappe.ui.form.on('Resultado', {
         frm.add_fetch("consulta", "edad", "edad")
         frm.add_fetch("consulta", "sucursal", "sucursal")
     },
+    validate: function (frm){
+        frm.set_value("hematologia_chequeados", 0);
+       $.map(frm.doc.indices_hematologicos, (row)=>{
+            var res = eval_result(row.rango_referencia, row.resultado);
+            var cdt = row.doctype;
+            var cdn = row.name;
+            if (res){
+                console.log(res);
+                console.log(row);
+                frappe.model.set_value(cdt, cdn, "resultado", res);
+            }
+            if (row.resultado && typeof(row.resultado) == "string" && row.resultado.includes("*"))
+                frm.set_value("hematologia_chequeados", 1);
+                
+       });
+       $.map(frm.doc.recuento_diferencial, (row)=>{
+            var res = eval_result(row.rango_referencia, row.resultado);
+            var cdt = row.doctype;
+            var cdn = row.name;
+            if (res){
+                console.log(res);
+                console.log(row);
+                frappe.model.set_value(cdt, cdn, "resultado", res);
+            }
+            if (row.resultado && typeof(row.resultado) == "string" && row.resultado.includes("*"))
+                frm.set_value("hematologia_chequeados", 1);
+
+
+       });
+        
+        frm.set_value("quimica_chequeados", 0);
+       $.map(frm.doc.indices_pruebas, (row)=>{
+            var res = eval_result(row.rango_ref, row.resultado);
+            var cdt = row.doctype;
+            var cdn = row.name;
+            if (res){
+                console.log(res);
+                console.log(row);
+                frappe.model.set_value(cdt, cdn, "resultado", res);
+            }
+            if (row.resultado && typeof(row.resultado) == "string" && row.resultado.includes("*"))
+                frm.set_value("quimica_chequeados", 1);
+       });
+    },
     organismo: function(frm) {
         frm.set_value("organismo", frm.doc.organismo.toUpperCase())
     },
@@ -127,6 +171,7 @@ frappe.ui.form.on('Resultado', {
                 if(response.message){
                     frm.refresh();
                     frappe.show_alert("Hematologia Actualizado!",5);
+                    frm.dirty()
                 }
 
             }});
@@ -137,8 +182,8 @@ frappe.ui.form.on('Resultado', {
                 if(response.message){
                     refresh_field("indices_pruebas")
                     frm.refresh_fields("test_quimicos")
-                    frm.dirty()
                     frappe.show_alert("Quimica Actualizada!",5);
+                    frm.dirty()
                 }
 
             }});
@@ -150,6 +195,7 @@ frappe.ui.form.on('Resultado', {
                     refresh_field("antibiogramas")
                     frm.refresh_fields("test_microbiologia")
                     frappe.show_alert("Microbiologia Actualizada!",5);
+                    frm.dirty()
                 }
 
             }});
@@ -160,6 +206,7 @@ frappe.ui.form.on('Resultado', {
                 if(response.message){
                     refresh_field("serologia")
                     frappe.show_alert("Serologia Actualizada!",5);
+                    frm.dirty()
                 }
 
             }});
@@ -175,6 +222,7 @@ frappe.ui.form.on('Resultado', {
                     frappe.dom.unfreeze()
                 ]); 
                 frappe.show_alert("Inmunodiagnosticos Actualizados!",5);
+                frm.dirty()
 
             }});
         }
@@ -184,6 +232,7 @@ frappe.ui.form.on('Resultado', {
                 if(response.message){
                     frappe.show_alert("Hormonas Actualizadas!",5);
                     frm.refresh();
+                    frm.dirty()
                 }
 
             }});
@@ -194,6 +243,7 @@ frappe.ui.form.on('Resultado', {
                 if(response.message){
                     frappe.show_alert("Tipificacion Actualizada!",5);
                     frm.refresh();
+                    frm.dirty()
                 }
 
             }});
@@ -207,6 +257,7 @@ frappe.ui.form.on('Resultado', {
                     set_events()
                     frm.refresh()
                     frappe.show_alert("Urianalisis Actualizado!",5);
+                    frm.dirty()
                 }
 
             }});
@@ -219,6 +270,7 @@ frappe.ui.form.on('Resultado', {
                     frm.dirty()
                     set_events()
                     frappe.show_alert("Coprologia Actualizada!",5);
+                    frm.dirty()
                 }
 
             }});
@@ -230,6 +282,7 @@ frappe.ui.form.on('Resultado', {
                     frm.refresh()
                     refresh_anexos(frm)
                     frappe.show_alert("Anexos Actualizado!",5);
+                    frm.dirty()
                 }
 
             }});
@@ -243,6 +296,7 @@ frappe.ui.form.on('Resultado', {
                     frm.refresh_fields("examen_macroscopico")
                     frm.dirty()
                     frappe.show_alert("Espermatograma Actualizado!",5);
+                    frm.dirty()
                 }
 
             }});
@@ -262,6 +316,29 @@ frappe.ui.form.on('Resultado', {
         frm.add_custom_button("Anexos",anexos,"Actualizar" )
     }
 });
+frappe.ui.form.on("Resultado Quimica", {
+    resultado:(frm, cdt, cdn) =>{
+        let row = frappe.model.get_doc(cdt, cdn);
+        let result = eval_result(row.rango_ref, row.resultado);
+        if (result)
+            frappe.model.set_value(cdt, cdn, "resultado", result);
+
+        frm.refresh_field("indices_pruebas");
+    }
+
+});
+frappe.ui.form.on("Resultados Hematologicos", {
+    resultado:(frm, cdt, cdn) =>{
+        let row = frappe.model.get_doc(cdt, cdn);
+        let result = eval_result(row.rango_referencia, row.resultado);
+        if (result)
+            frappe.model.set_value(cdt, cdn, "resultado", result);
+
+        frm.refresh_field("indices_pruebas");
+    }
+
+});
+
 function refresh_anexos(frm){
 
 	refresh_field("test_prb_000000065")
@@ -331,6 +408,137 @@ function refresh_modules(frm) {
         }
     });*/
 }
+function eval_result(eval_range, result){
+
+    var eval_range = clean_str(eval_range);
+    var result = clean_str(result);
+
+
+    if (eval_range.includes("-")){
+        // This is a range let's get min and max
+        var min = eval_range.split("-")[0];
+        var max = eval_range.split("-")[1];
+        
+        // console.log("min: " + min + " max: "+ max +" result: "+ result);
+
+        if (isNaN(result) || isNaN(min) || isNaN(max))
+        {
+            // console.log("Alguno de los datos no es un numero");
+            // If is not a number then i can't do nothing with it 
+            return result
+        }
+
+        min = eval(min);
+        max = eval(max);
+        result = roundNumber(result, 3);
+
+        if (result < min || result > max)
+        {
+            // The result is out of range, * was added
+            // console.log("Out of range, * added");
+            
+            return result+"*"
+        }
+
+        return result
+    }
+    else if (eval_range.includes("&lt;=") || eval_range.includes("<=")){
+
+        // console.log("result:"+result+" > range:"+eval_range);
+
+        if (isNaN(result))
+            return result
+        
+        eval_range = eval_range.replace("&lt;=", "");
+        eval_range = eval_range.replace("<=", "");
+        result = roundNumber(result, 3);
+        if (result > eval(eval_range)){
+            // console.log("Out of range, * added");
+            return result+"*" 
+        }
+
+        return result
+    }
+    // else if (eval_range.includes("<")){
+    else if (eval_range.includes("&lt;") || eval_range.includes("<") ){
+
+        // console.log("result:"+result+" >= range:"+eval_range);
+
+        if (isNaN(result))
+            return result
+        
+        eval_range = eval_range.replace("&lt;", "");
+        eval_range = eval_range.replace("<", "");
+        result = roundNumber(result, 3);
+        
+
+        if (result >= eval(eval_range)){
+            // console.log("Out of range, * added");
+            return result+"*" 
+        }
+
+        return result
+    }
+    else if (eval_range.includes("&gt;=") || eval_range.includes(">=")){
+
+        // console.log("result:"+result+" < range:"+eval_range);
+
+        if (isNaN(result))
+            return result
+        
+        eval_range = eval_range.replace("&gt;=", "");
+        eval_range = eval_range.replace(">=", "");
+        result = roundNumber(result, 3);
+        if (result < eval(eval_range)){
+            // console.log("Out of range, * added");
+            return result+"*"
+        } 
+
+        return result
+    }
+    else if (eval_range.includes(">") || eval_range.includes("&gt;")){
+
+        // console.log("result:"+result+" <= range:"+eval_range);
+
+        if (isNaN(result))
+            return result
+        
+        eval_range = eval_range.replace("&gt;", "");
+        eval_range = eval_range.replace(">", "");
+        result = roundNumber(result, 3);
+        if (result <= eval(eval_range)){
+            // console.log("Out of range, * added");
+            return result+"*"
+        } 
+
+        return result
+    }
+
+    return result
+}
+
+function clean_str(s) {
+    if (!s || typeof(s) == "number")
+        return 
+    // console.log("Cleaning s: "+s);
+
+    let temp = s
+    
+    // Let's remove double dots
+    temp = s ? s.replace("..",".") : temp ;
+    // console.log("Cleaning temp: "+temp);
+
+    // Let's remove spaces
+    temp = replace_all(temp, " ","");
+    
+    // Let's asterix
+    temp = replace_all(temp, "*","");
+
+    console.log("Return temp: "+temp);
+
+    return temp
+}
+
 function set_events(frm)
 {
     

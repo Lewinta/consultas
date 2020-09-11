@@ -6,6 +6,7 @@ frappe.ui.form.on('Paciente', {
 	refresh: function(frm) {
 		//frappe.model.set_value(frm.doctype,frm.docname,"responsable",frappe.session.user);
 		frm.trigger("add_toolbar_buttons")	
+		frm.set_df_property("nombre_completo", "read_only", true);
 	},
 	after_save: function(frm) {
 		if(frm.doc.name != frm.doc.nombre_completo){
@@ -124,7 +125,7 @@ frappe.ui.form.on('Paciente', {
 			var onsubmit = function(values){
 				
 				var days = frappe.datetime.get_diff(frappe.datetime.get_today(), values.fecha_nacimiento)
-				cur_frm.set_value("edad",parseInt(days/365))
+				frm.set_value("edad",parseInt(days/365))
 			}
  
 			frappe.prompt(fields,onsubmit,'Calcular Edad del Paciente','Calcular')

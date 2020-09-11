@@ -11,6 +11,13 @@ class ConsultaPrivada(Document):
 	def before_insert(self):
 		self.id=make_autoname("CLP-.##########")
 
+	def validate(self):
+		pruebas = [r.prueba for r in self.pruebas]
+		for row in self.pruebas:
+			check_duplicates(row, pruebas)
+			check_price(row)
+		self.calculate_totals()
+	
 	def guardar_lista_de_precio(self):
 		self.new_inserted = False
 		for row in self.pruebas:
@@ -47,3 +54,20 @@ class ConsultaPrivada(Document):
 			return result[0].name
 			
 		return None
+	
+	def calculate_totals(self):
+		self.diferencia = sum([x.diferencia for x in self.pruebas])
+
+def check_price(row):
+	if row.diferencia <= .00:
+		frappe.throw("""
+			<p class='text-center'><b>Precio invalido</b></p><b>Prueba: </b>{prueba_nombre}<br> 
+			<b>Linea:</b> {idx}
+			""".format(**row.as_dict())
+		)
+def check_duplicates(row, pruebas):
+	if pruebas.count(row.prueba) > 1:
+		frappe.throw("""
+		<p class='text-center'><b>Prueba duplicada</b></p><b>Prueba: </b>{prueba_nombre}<br> 
+		""".format(**row.as_dict())
+	)	

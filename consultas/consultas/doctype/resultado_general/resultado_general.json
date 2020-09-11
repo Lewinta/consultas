@@ -13,6 +13,7 @@
  "engine": "InnoDB", 
  "fields": [
   {
+   "allow_bulk_edit": 0, 
    "allow_on_submit": 0, 
    "bold": 1, 
    "collapsible": 0, 
@@ -29,7 +30,7 @@
    "label": "Prueba", 
    "length": 0, 
    "no_copy": 0, 
-   "options": "Indice Prueba", 
+   "options": " ", 
    "permlevel": 0, 
    "precision": "", 
    "print_hide": 0, 
@@ -43,6 +44,7 @@
    "unique": 0
   }, 
   {
+   "allow_bulk_edit": 0, 
    "allow_on_submit": 0, 
    "bold": 1, 
    "collapsible": 0, 
@@ -59,7 +61,7 @@
    "label": "Metodo", 
    "length": 0, 
    "no_copy": 0, 
-   "options": "prueba.metodo", 
+   "options": " ", 
    "permlevel": 0, 
    "precision": "", 
    "print_hide": 0, 
@@ -73,6 +75,7 @@
    "unique": 0
   }, 
   {
+   "allow_bulk_edit": 0, 
    "allow_on_submit": 0, 
    "bold": 1, 
    "collapsible": 0, 
@@ -89,7 +92,7 @@
    "label": "Rango Ref.", 
    "length": 0, 
    "no_copy": 0, 
-   "options": "prueba.rango_referencia", 
+   "options": " ", 
    "permlevel": 0, 
    "precision": "", 
    "print_hide": 0, 
@@ -103,6 +106,7 @@
    "unique": 0
   }, 
   {
+   "allow_bulk_edit": 0, 
    "allow_on_submit": 0, 
    "bold": 0, 
    "collapsible": 0, 
@@ -132,6 +136,7 @@
    "unique": 0
   }, 
   {
+   "allow_bulk_edit": 0, 
    "allow_on_submit": 0, 
    "bold": 1, 
    "collapsible": 0, 
@@ -148,7 +153,7 @@
    "label": "UDS", 
    "length": 0, 
    "no_copy": 0, 
-   "options": "prueba.uds", 
+   "options": " ", 
    "permlevel": 0, 
    "precision": "", 
    "print_hide": 0, 
@@ -162,6 +167,7 @@
    "unique": 0
   }, 
   {
+   "allow_bulk_edit": 0, 
    "allow_on_submit": 0, 
    "bold": 0, 
    "collapsible": 0, 
@@ -178,7 +184,7 @@
    "label": "prueba_name", 
    "length": 0, 
    "no_copy": 0, 
-   "options": "prueba.prueba", 
+   "options": " ", 
    "permlevel": 0, 
    "precision": "", 
    "print_hide": 0, 
@@ -202,7 +208,7 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2017-07-23 17:06:16.806879", 
+ "modified": "2019-04-15 11:51:11.392141", 
  "modified_by": "Administrator", 
  "module": "Consultas", 
  "name": "Resultado General", 

@@ -12,14 +12,19 @@ class Paciente(Document):
 	
 	def before_insert(self):
 		self.web_hash = frappe.generate_hash("Paciente",10)
+		# self.name = make_autoname("PAC-.#####")
+		# self.insert()
+		# frappe.db.commit()	
+		
 	# def save(self):
-	# 	#doc = frappe.get_doc("Paciente",self.id)
-	# 	#doc.name=self.nombre_completo
-	# 	#frappe.errprint("old {0} new {1}".format(self.name,self.nombre_completo))
-	# 	#self.name=self.nombre_completo
-	# 	#frappe.errprint("old {0} new {1}".format(self.name,self.nombre_completo))
-	# 	self.update()
-	# 	#print(self.name)
+		# pass
+		#doc = frappe.get_doc("Paciente",self.id)
+		#doc.name=self.nombre_completo
+		#frappe.errprint("old {0} new {1}".format(self.name,self.nombre_completo))
+		#self.name=self.nombre_completo
+		#frappe.errprint("old {0} new {1}".format(self.name,self.nombre_completo))
+		# self.update()
+		#print(self.name)
 
 @frappe.whitelist()
 def make_consulta(source_name,tipo_consulta ,target_doc = None):

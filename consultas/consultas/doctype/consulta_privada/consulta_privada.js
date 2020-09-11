@@ -1,7 +1,7 @@
 // Copyright (c) 2016, Lewin Villar and contributors
 // For license information, please see license.txt
 frappe.ui.form.on('Consulta Privada', {
-	onload: function(frm) {
+	onload:  frm =>  {
 		if (!frm.doc.__islocal) return;
 		//frappe.model.set_value(frm.doctype, frm.docname, "fecha", new Date());
 		var callback = function(data) {
@@ -13,7 +13,14 @@ frappe.ui.form.on('Consulta Privada', {
 		};
 		frappe.model.get_value("User", frappe.session.user, "empresa", callback);
 	},
-	medico: function(frm, cdt, cdn) {
+	refresh: frm => {
+		if (!frm.is_new())
+			frm.trigger("add_custom_buttons");
+	},
+	add_custom_buttons: frm => {
+
+	},
+	medico: frm => {
 		var tDiferencia = 0;
 		var med=frm.doc.medico;
 		if ( !frm.doc.medico) med="none";
@@ -41,7 +48,7 @@ frappe.ui.form.on('Consulta Privada', {
 			});
 		}
 	},
-	es_referido:function(frm, cdt, cdn) {
+	es_referido: frm => {
 	   
 		//Si el paciente es referido, debe existir algun medico
 		if(frm.doc.es_referido)
@@ -76,13 +83,11 @@ frappe.ui.form.on('Consulta Privada', {
 			});
 		}
 	},
-	validate: function(frm, cdt, cdn) {
+	validate: frm => {
 		frappe.model.set_value(frm.doctype, frm.docname, "responsable", frappe.session.user);
-
-		
 		
 	},
-	before_submit:function(frm){
+	before_submit: frm => {
 		
 		var callback = function(data) {
 		   // console.log(data);
@@ -110,7 +115,7 @@ frappe.ui.form.on('Consulta Privada', {
 	}
 });
 frappe.ui.form.on("Consulta Prueba Privada", {
-	prueba: function(frm, cdt, cdn) {
+	prueba: (frm, cdt, cdn) => {
 		var tDiferencia = 0;
 		
 		var row = locals[cdt][cdn];
@@ -136,7 +141,7 @@ frappe.ui.form.on("Consulta Prueba Privada", {
 		if (row.prueba) frappe.model.get_value("Lista Precio", {ars_medico: med,prueba: row.prueba},"monto", busca_precio);
 		else frm.get_field("pruebas").grid.grid_rows[row.idx-1].remove();
 	},
-	diferencia: function(frm, cdt, cdn) {
+	diferencia: (frm, cdt, cdn) => {
 		var tDiferencia = 0;
 		var row = locals[cdt][cdn];
 
