@@ -8,7 +8,6 @@ frappe.ui.form.on('Consulta Privada', {
 			
 			frappe.model.get_value("Empresa",data.empresa, "nombre", function (data){
 				frappe.model.set_value(frm.doctype, frm.docname, "empresa", data.nombre);				
-				console.log(data.nombre);
 			});			
 		};
 		frappe.model.get_value("User", frappe.session.user, "empresa", callback);

@@ -116,10 +116,25 @@ frappe.ui.form.on('Resultado', {
    giardia: function(frm){
     frm.set_value("giardia", frm.doc.giardia.toUpperCase())
    },
+   tiene_parasitos_heces: function(frm){
+    frm.set_value("parasitos_heces", frm.doc.tiene_parasitos_heces ? "":"NO SE OBSERVAN ELEMENTOS PARASITARIOS EN ESTA MUESTRA.")
+   },
+   tiene_amebas_heces: function(frm){
+    frm.set_value("amebas_heces", frm.doc.tiene_amebas_heces ? "":"NO SE OBSERVAN EN ESTA MUESTRA.")
+   },
+   tiene_giardia_heces: function(frm){
+    frm.set_value("giardia_heces", frm.doc.tiene_giardia_heces ? "":"NO SE OBSERVAN EN ESTA MUESTRA.")
+   },
+   parasitos_heces: function(frm){
+    frm.set_value("parasitos_heces", frm.doc.parasitos_heces.toUpperCase())
+   },
+   amebas_heces: function(frm){
+    frm.set_value("amebas_heces", frm.doc.amebas_heces.toUpperCase())
+   },
+   giardia_heces: function(frm){
+    frm.set_value("giardia_heces", frm.doc.giardia_heces.toUpperCase())
+   },
     paciente: function(frm) {
-
-
-      
         if (frm.doc.consulta) {
             let fields = ["cedula_pasaporte", "sexo", "edad", "telefono"]
             frappe.db.get_value("Paciente", frm.doc.paciente, fields)
@@ -547,7 +562,6 @@ function set_events(frm)
         current_table = event.currentTarget.dataset.fieldname
     })
 
-           // if (frm.doc.indices_urinarios) {
     $("div[data-fieldname='examen_fisicoquimico']").click(function(event) {
         var indice = event.currentTarget.parentElement.childNodes[1].textContent;
         frappe.model.get_value("Indice Urinario", {
@@ -560,8 +574,6 @@ function set_events(frm)
             }
         });
     });
-                //remove eventsbefore adding it
-                //$("[data-fieldname='sedimentos_urinarios'] [data-fieldname='sedimentos_urinarios'] div[data-fieldname='examen_fisicoquimico']").off("click");
     $("[data-fieldname='sedimentos_urinarios'] [data-fieldname='sedimentos_urinarios'] div[data-fieldname='examen_fisicoquimico']").click(function(event) {
         var indice = event.currentTarget.parentElement.childNodes[1].textContent;
         frappe.model.get_value("Indice Urinario", {

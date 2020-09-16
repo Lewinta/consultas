@@ -4,5 +4,9 @@
 frappe.ui.form.on('Indice Urinario', {
 	refresh: function(frm) {
 
+	},
+	opciones: frm => {
+		if (frm.doc.opciones)
+			frm.set_value("opciones", frm.doc.opciones.toUpperCase());
 	}
 });

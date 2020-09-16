@@ -639,6 +639,46 @@ class Resultado(Document):
 						row.examen_fisicoquimico = tmp.examen_fisicoquimico
 		
 		return True
+	def get_digestion_heces(self):
+		temp = self.aspecto_fisico_heces if hasattr(self,'aspecto_fisico_heces') else 0.00 
+		self.aspecto_fisico_heces = []
+		filters = {"disponible": 1, "digestion_heces":1, "tipo_indice":"Aspecto Fisico"}
+		result = frappe.get_list("Indice Urinario", filters,["nombre"],order_by="creation ASC",limit_page_length=0)
+		tiene_digestion_heces = frappe.db.sql("""SELECT prueba from `{0}` WHERE parent='{1}' AND prueba = 'PRB-000000210' """  
+			.format(self.get_consult_table(), self.consulta), as_dict=True)
+		 
+		self.test_digestion_heces = 1 if result and tiene_digestion_heces else 0	
+		for indice in result:
+		
+			self.append("aspecto_fisico_heces",{
+				"indice_urinario": indice.nombre, 
+			})
+
+		if temp and result:
+			for row in self.aspecto_fisico_heces:
+				for tmp in temp:
+					if row.indice_urinario == tmp.indice_urinario:
+						row.examen_fisicoquimico = tmp.examen_fisicoquimico
+
+		temp = self.aspecto_microscopico_heces  if hasattr(self,'aspecto_microscopico_heces') else 0.00 
+		self.aspecto_microscopico_heces = []	
+		filters = {"disponible": 1, "digestion_heces":1, "tipo_indice":"Aspecto Microscopico"}
+		result = frappe.get_list("Indice Urinario", filters, ["nombre"], order_by="nombre ASC")
+		for indice in result:
+			frappe.errprint(indice.nombre)
+			self.append("aspecto_microscopico_heces",{
+				"indice_urinario": indice.nombre, 
+				#"examen_fisicoquimico":""
+				
+			})
+
+		if temp and result:
+			for row in self.aspecto_microscopico_heces:
+				for tmp in temp:
+					if row.indice_urinario == tmp.indice_urinario:
+						row.examen_fisicoquimico = tmp.examen_fisicoquimico
+		
+		return True
 	def get_anexos(self):
 		self_dict = self.as_dict()
 		consulta = frappe.get_doc(self.consulta_tipo, self.consulta)
@@ -705,6 +745,7 @@ class Resultado(Document):
 	def get_table_items(self):
 		self.refresh_personal_info()
 		self.get_quimica()
+		self.get_digestion_heces()
 		self.get_serologia()
 		self.get_inmunodiagnostico()
 		self.get_hormonas()
