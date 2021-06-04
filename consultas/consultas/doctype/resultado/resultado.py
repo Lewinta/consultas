@@ -82,7 +82,6 @@ class Resultado(Document):
 		if(consulta):
 			consulta.resultado = name
 
-
 	def get_quimica(self):
 
 		temp = self.indices_pruebas if hasattr(self,'indices_pruebas') else 0.00 
@@ -93,7 +92,7 @@ class Resultado(Document):
 			ON 
 				I.prueba = C.prueba 
 			WHERE 
-				C.parent = '{1}' AND I.grupo = 'QUIMICA' 
+				C.parent = '{1}' AND I.grupo = 'QUIMICA' AND C.prueba != 'PRB-000000149'
 			ORDER BY C.idx"""
 			.format(self.get_consult_table(), self.consulta),
 		as_dict=True)
@@ -110,6 +109,8 @@ class Resultado(Document):
 			if (prueba.rango_por_edad):
 				prueba.rango_ref = get_rango_por_edad(prueba.indice, self.edad)
 
+			if prueba.name == "PRB-000000149":
+				continue
 			if prueba.name == "PRB-000000044":
 				self.append("indices_pruebas",{"prueba":"BILIRRUBINA TOTAL","metodo":"QLM","rango_ref":"0.0 - 1.00","uds":"MG/DL"})
 				self.append("indices_pruebas",{"prueba":"DIRECTA","metodo":"QLM","rango_ref":"0-0.20","uds":"MG/DL"})
@@ -132,6 +133,13 @@ class Resultado(Document):
 				self.append("indices_pruebas",{"prueba":"GLUCOSA 60 MINUTOS","metodo":"QML","rango_ref":"60 - 110","uds":"MG/DL"})
 				self.append("indices_pruebas",{"prueba":"GLUCOSA 90 MINUTOS","metodo":"QML","rango_ref":"60 - 110","uds":"MG/DL"})
 				self.append("indices_pruebas",{"prueba":"GLUCOSA 120 MINUTOS","metodo":"QML","rango_ref":"60 - 110","uds":"MG/DL"})
+				continue
+			if prueba.name == "PRB-000000338":
+				self.append("indices_pruebas",{"prueba":"GLUCOSA BASAL","metodo":" ","rango_ref":"NEG - POS","uds":" "})
+				self.append("indices_pruebas",{"prueba":"GLUCOSA 30 MINUTOS","metodo":" ","rango_ref":"NEG - POS","uds":" "})
+				self.append("indices_pruebas",{"prueba":"GLUCOSA 60 MINUTOS","metodo":" ","rango_ref":"NEG - POS","uds":" "})
+				self.append("indices_pruebas",{"prueba":"GLUCOSA 90 MINUTOS","metodo":" ","rango_ref":"NEG - POS","uds":" "})
+				self.append("indices_pruebas",{"prueba":"GLUCOSA 120 MINUTOS","metodo":" ","rango_ref":"NEG - POS","uds":" "})
 				continue
 			# self.append("indices_pruebas",prueba)
 			self.append("indices_pruebas",{"prueba":prueba.prueba,"metodo":prueba.metodo,"rango_ref":prueba.rango_ref,"uds":prueba.uds})
@@ -171,6 +179,11 @@ class Resultado(Document):
 			if prueba.prueba_cod == "PRB-000000317":
 				self.append("serologia",{"prueba":"ACS IGG ANTI SARS-COV-2","metodo":"INMUNOCROMATOGRAFIA CUALITATIVA","rango_ref":"NEG - POS","uds":"-"})
 				self.append("serologia",{"prueba":"ACS IGM ANTI SARS-COV-2","metodo":"INMUNOCROMATOGRAFIA CUALITATIVA","rango_ref":"NEG - POS","uds":"-"})
+
+				continue
+			if prueba.prueba_cod == "PRB-000000344":
+				self.append("serologia",{"prueba":"ACS IGM ANTI SARS-COV-2","metodo":"INMUNOCROMATOGRAFIA CUANTITATIVA","rango_ref":"0.0 - 0.04","uds":"-"})
+				self.append("serologia",{"prueba":"ACS IGG ANTI SARS-COV-2","metodo":"INMUNOCROMATOGRAFIA CUANTITATIVA","rango_ref":"0.0 - 0.04","uds":"-"})
 
 				continue
 
@@ -218,6 +231,12 @@ class Resultado(Document):
 				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba": " ", "metodo": "CONTROL", "rango_ref": "          ", "uds": "SEGUNDOS"})	
 				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba": " ", "metodo": "INR"    , "rango_ref": "0.9 - 1.2" , "uds": "SEGUNDOS"})	
 				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba": " ", "metodo": "%"      , "rango_ref": "70 - 120"," uds":"%"})	
+				continue
+
+			if prueba.name == "PRB-000000352":
+				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba": "INFLUENZA A", "metodo": " ", "rango_ref": "NEG - POS", "uds": " "})	
+				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba": "INFLUENZA B", "metodo": " "    , "rango_ref": "NEG - POS" , "uds": " "})	
+				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba": "INFLUENZA H1N1", "metodo": " "  , "rango_ref": "NEG - POS"," uds":" "})	
 				continue
 
 			if prueba.name == "PRB-000000060":
@@ -357,7 +376,6 @@ class Resultado(Document):
 
 		return True 
 		
-
 	def get_microbiologia(self):
 		temp = self.antibiogramas if hasattr(self,'antibiogramas') else 0.00 
 		temp1 = self.bacteriologia_vaginal if hasattr(self,'bacteriologia_vaginal') else 0.00 
@@ -400,6 +418,9 @@ class Resultado(Document):
 				self.tipo_cultivo = "SEMEN"
 				return 0
 
+			if prueba.name == "PRB-000000347":
+				self.tipo_cultivo = "HEMOCULTIVO"
+
 			if prueba.name == "PRB-000000194":
 				self.tipo_cultivo = "SECRECION DE OIDO"
 				
@@ -411,22 +432,38 @@ class Resultado(Document):
 				self.append("bacteriologia_vaginal", {"valor": "TRICHOMONAS", "resultado": "", "interpretacion": "-" })
 				self.tipo_cultivo = "SECRECION VAGINAL"
 
-			self.append("antibiogramas", {"valor": "CIPROFLOXACIN", "resultado": "", "interpretacion": "-"})	
-			self.append("antibiogramas", {"valor": "BENZILPENCILLINS", "resultado": "", "interpretacion": "-" })	
-			self.append("antibiogramas", {"valor": "CLINDAMYCIN", "resultado": "", "interpretacion": "-" })	
-			self.append("antibiogramas", {"valor": "ERITROMICIN", "resultado": "", "interpretacion": "-" })	
-			self.append("antibiogramas", {"valor": "GENTAMICIN", "resultado": "", "interpretacion": "-" })
-			self.append("antibiogramas", {"valor": "LEVOFLOXACIN", "resultado": "", "interpretacion": "-" })
-			self.append("antibiogramas", {"valor": "LINEZOLID", "resultado": "", "interpretacion": "-" })
-			self.append("antibiogramas", {"valor": "MOXIFLOXACIN", "resultado": "", "interpretacion": "-" })
-			self.append("antibiogramas", {"valor": "NITROFURANTOIN", "resultado": "", "interpretacion": "-" })
-			self.append("antibiogramas", {"valor": "QUINUPRI/DALFOPRI", "resultado": "", "interpretacion": "-" })
-			self.append("antibiogramas", {"valor": "RIFAMPICIN", "resultado": "", "interpretacion": "-" })
-			self.append("antibiogramas", {"valor": "T. SULFA", "resultado": "", "interpretacion": "-" })
-			self.append("antibiogramas", {"valor": "TETRACYCLINE", "resultado": "", "interpretacion": "-" })
-			self.append("antibiogramas", {"valor": "TIGECICLINAS", "resultado": "", "interpretacion": "-" })
-			self.append("antibiogramas", {"valor": "VACOMYCIN", "resultado": "", "interpretacion": "-" })
-			self.append("antibiogramas", {"valor": "CEFOXITIN", "resultado": "", "interpretacion": "-" })
+			# self.append("antibiogramas", {"valor": "CIPROFLOXACIN", "resultado": "", "interpretacion": "-"})	
+			# self.append("antibiogramas", {"valor": "BENZILPENCILLINS", "resultado": "", "interpretacion": "-" })	
+			# self.append("antibiogramas", {"valor": "CLINDAMYCIN", "resultado": "", "interpretacion": "-" })	
+			# self.append("antibiogramas", {"valor": "ERITROMICIN", "resultado": "", "interpretacion": "-" })	
+			# self.append("antibiogramas", {"valor": "GENTAMICIN", "resultado": "", "interpretacion": "-" })
+			# self.append("antibiogramas", {"valor": "LEVOFLOXACIN", "resultado": "", "interpretacion": "-" })
+			# self.append("antibiogramas", {"valor": "LINEZOLID", "resultado": "", "interpretacion": "-" })
+			# self.append("antibiogramas", {"valor": "MOXIFLOXACIN", "resultado": "", "interpretacion": "-" })
+			# self.append("antibiogramas", {"valor": "NITROFURANTOIN", "resultado": "", "interpretacion": "-" })
+			# self.append("antibiogramas", {"valor": "QUINUPRI/DALFOPRI", "resultado": "", "interpretacion": "-" })
+			# self.append("antibiogramas", {"valor": "RIFAMPICIN", "resultado": "", "interpretacion": "-" })
+			# self.append("antibiogramas", {"valor": "T. SULFA", "resultado": "", "interpretacion": "-" })
+			# self.append("antibiogramas", {"valor": "TETRACYCLINE", "resultado": "", "interpretacion": "-" })
+			# self.append("antibiogramas", {"valor": "TIGECICLINAS", "resultado": "", "interpretacion": "-" })
+			# self.append("antibiogramas", {"valor": "VACOMYCIN", "resultado": "", "interpretacion": "-" })
+			# self.append("antibiogramas", {"valor": "CEFOXITIN", "resultado": "", "interpretacion": "-" })
+
+			self.append("antibiogramas", {"valor": "AMIKACIN", "resultado": "", "interpretacion": "-"})
+			self.append("antibiogramas", {"valor": "AMPILICIN", "resultado": "", "interpretacion": "-"})
+			self.append("antibiogramas", {"valor": "CEFAZOLIN", "resultado": "", "interpretacion": "-"})
+			self.append("antibiogramas", {"valor": "CEFEPIME", "resultado": "", "interpretacion": "-"})
+			self.append("antibiogramas", {"valor": "CEFTAZIDIME", "resultado": "", "interpretacion": "-"})
+			self.append("antibiogramas", {"valor": "CIPROFLOXACIN", "resultado": "", "interpretacion": "-"})
+			self.append("antibiogramas", {"valor": "CEFTRIAXONE", "resultado": "", "interpretacion": "-"})
+			self.append("antibiogramas", {"valor": "GENTAMICIN", "resultado": "", "interpretacion": "-"})
+			self.append("antibiogramas", {"valor": "IMIPENEM", "resultado": "", "interpretacion": "-"})
+			self.append("antibiogramas", {"valor": "NITROFURANTOIN", "resultado": "", "interpretacion": "-"})
+			self.append("antibiogramas", {"valor": "LEVOFLOXACIN", "resultado": "", "interpretacion": "-"})
+			self.append("antibiogramas", {"valor": "POPERAC", "resultado": "", "interpretacion": "-"})
+			self.append("antibiogramas", {"valor": "TOBRAMYCIN", "resultado": "", "interpretacion": "-"})
+			self.append("antibiogramas", {"valor": "TRIMETHO", "resultado": "", "interpretacion": "-"})
+			self.append("antibiogramas", {"valor": "ERTAPENEM", "resultado": "", "interpretacion": "-"})
 
 
 		if temp and result:
@@ -446,7 +483,6 @@ class Resultado(Document):
 
 		return True
 	
-
 	def get_hormonas(self):
 		temp = self.hormonas if hasattr(self,'hormonas') else 0.00 
 		result = frappe.db.sql("""SELECT I.prueba_nombre AS prueba, I.uds, I.metodo, I.rango_referencia AS rango_ref
@@ -496,7 +532,6 @@ class Resultado(Document):
 					if row.prueba == tmp.prueba:
 						row.resultado = tmp.resultado
 		return True
-	
 
 	def get_hematologia(self):
 		def compare_lists(l1, l2):
@@ -597,6 +632,39 @@ class Resultado(Document):
 					if row.indice_urinario == tmp.indice_urinario:
 						row.examen_fisicoquimico = tmp.examen_fisicoquimico
 		return True
+	
+	def get_otros_uroanalisis(self):
+		temp = self.otros_uroanalisis  if hasattr(self,'otros_uroanalisis') else 0.00 
+		result = frappe.db.sql("""SELECT C.prueba AS prueba_cod, I.prueba_nombre AS prueba, I.uds, I.metodo, I.rango_referencia AS rango_ref
+			FROM 
+				`tabIndice Prueba` I JOIN `{0}` C 
+			ON 
+				I.prueba = C.prueba 
+			WHERE 
+				C.parent = '{1}' AND I.grupo = 'OTROS UROANALISIS'
+			ORDER BY C.idx"""
+			.format(self.get_consult_table(), self.consulta), as_dict=True)
+		
+		self.otros_uroanalisis = []
+		self.test_otros_uroanalisis = 1 if result else 0
+		for prueba in result:
+			# self.append("otros_uroanalisis", prueba)
+			if prueba.prueba_cod == "PRB-000000353":
+				self.append("otros_uroanalisis",{"prueba":"CRENADOS","metodo":"-","rango_ref":"0 - 100","uds":"%"})
+				self.append("otros_uroanalisis",{"prueba":"DISFORMICOS","metodo":"-","rango_ref":"0 - 100","uds":"%"})
+				self.append("otros_uroanalisis",{"prueba":"NORMALES","metodo":"-","rango_ref":"0 - 100","uds":"%"})
+				self.append("otros_uroanalisis",{"prueba":"TOTAL GLOBULOS OBSERVADOS","metodo":"-","rango_ref":" ","uds":"p/c"})
+				self.append("otros_uroanalisis",{"prueba":"SANGRE OCULTA","metodo":"-","rango_ref":"NEG - POS","uds":" "})
+
+				continue
+
+		if temp and result:
+			for row in self.otros_uroanalisis:
+				for tmp in temp:
+					if row.prueba == tmp.prueba:
+						row.resultado = tmp.resultado
+		return True
+
 	def get_coprologia(self):
 		temp = self.aspecto_fisico if hasattr(self,'aspecto_fisico') else 0.00 
 		self.aspecto_fisico = []
@@ -639,6 +707,42 @@ class Resultado(Document):
 						row.examen_fisicoquimico = tmp.examen_fisicoquimico
 		
 		return True
+	
+	def get_depuracion_creatinina(self):
+		temp = self.indices_pruebas if hasattr(self,'depuracion_creatinina_table') else 0.00 
+
+		result = frappe.db.sql("""SELECT C.prueba AS name, I.prueba_nombre AS prueba, I.uds, I.metodo,I.name as indice,I.rango_por_edad, I.rango_referencia AS rango_ref
+			FROM 
+				`tabIndice Prueba` I JOIN `{0}` C 
+			ON 
+				I.prueba = C.prueba 
+			WHERE 
+				C.parent = '{1}' AND I.grupo = 'QUIMICA'  AND C.prueba = 'PRB-000000149'
+			ORDER BY C.idx"""
+			.format(self.get_consult_table(), self.consulta),
+		as_dict=True)
+		frappe.errprint(result)
+		self.depuracion_creatinina_table = []
+		self.test_prb_000000149 = 1 if result else 0
+		for prueba in result:
+			if (prueba.rango_por_edad):
+				prueba.rango_ref = get_rango_por_edad(prueba.indice, self.edad)
+
+			self.append("depuracion_creatinina_table",{"prueba":"DIURESIS","metodo":"-","rango_ref":" ","uds":"ML/24 Horas"})
+			self.append("depuracion_creatinina_table",{"prueba":"SUPERFICIE CORPOREA","metodo":"-","rango_ref":" ","uds":" "})
+			self.append("depuracion_creatinina_table",{"prueba":"CREATININA EN SUERO","metodo":"-","rango_ref":"0.6 - 1.2","uds":"MG/DL"})
+			self.append("depuracion_creatinina_table",{"prueba":"CREATININA ORINA","metodo":"-","rango_ref":" ","uds":"MG/DL"})
+			self.append("depuracion_creatinina_table",{"prueba":"CREATININA ORINA 24 HRS","metodo":"-","rango_ref":"1.0 - 1.5","uds":"ML/MIN"})
+			self.append("depuracion_creatinina_table",{"prueba":"DCE","metodo":"-","rango_ref":" ","uds":"ML/MIN"})
+			self.append("depuracion_creatinina_table",{"prueba":"DCE CORREGIDA","metodo":"-","rango_ref":"98 - 156","uds":"ML/MIN"})
+		
+		if temp and result:
+			for row in self.depuracion_creatinina_table:
+				for tmp in temp:
+					if row.prueba == tmp.prueba:
+						row.resultado = tmp.resultado
+		return True
+	
 	def get_digestion_heces(self):
 		temp = self.aspecto_fisico_heces if hasattr(self,'aspecto_fisico_heces') else 0.00 
 		self.aspecto_fisico_heces = []
@@ -696,7 +800,6 @@ class Resultado(Document):
 					"es_una_tabla",
 					"interpretacion"
 				], order_by = "indice")
-	
 			# No se le reporta Anexos a la TSH si el paciente es hombre
 			# if prueba.prueba == "PRB-000000065" and self.sexo == "MASCULINO":
 				# continue
@@ -729,6 +832,9 @@ class Resultado(Document):
 				elif prueba.prueba == "PRB-000000326":
 					self.quimica_observaciones = anexos[0].interpretacion if not self.quimica_observaciones else \
 						"<br>{}".format(anexos[0].interpretacion)
+				elif prueba.prueba == "PRB-000000339":
+					self.quimica_observaciones = anexos[0].interpretacion if not self.quimica_observaciones else \
+						"<br>{}".format(anexos[0].interpretacion)
 
 				else:
 					self.otros_anexos = 1
@@ -737,6 +843,11 @@ class Resultado(Document):
 			self.test_anexos = show_anexos 
 		# frappe.errprint("{} {}".format(self.test_anexos, self.test_prb_000000065))
 		return True
+	
+	def get_others(self):
+		self.get_digestion_heces()
+		self.get_depuracion_creatinina()
+
 	def has_urianalisis(self):
 
 		tipo_cons = "Consulta Prueba Privada" if self.consulta_tipo == "Consulta Privada" else "Consulta Prueba"
@@ -745,14 +856,15 @@ class Resultado(Document):
 	def get_table_items(self):
 		self.refresh_personal_info()
 		self.get_quimica()
-		self.get_digestion_heces()
 		self.get_serologia()
 		self.get_inmunodiagnostico()
 		self.get_hormonas()
 		self.get_tipificacion()
 		self.get_hematologia()
 		self.get_urianalisis()
+		self.get_otros_uroanalisis()
 		self.get_coprologia()
 		self.get_anexos()
 		self.get_microbiologia()
 		self.get_espermatograma()
+		self.get_others()

@@ -2,7 +2,7 @@
 // For license information, please see license.txt
 /* eslint-disable */
 
-frappe.query_reports["Resumen de Ventas"] = {
+frappe.query_reports["Detalle de Ventas Betalab"] = {
 	"filters": [
 		{
 			"label": __("From Date"),
@@ -18,17 +18,19 @@ frappe.query_reports["Resumen de Ventas"] = {
 			"default": frappe.datetime.year_end(),
 			"reqd": 1,
 		},
+		// {
+		// 	"label": __("Sucursal"),
+		// 	"fieldname": "sucursal",
+		// 	"fieldtype": "Link",
+		// 	"options": "Empresa",
+		// 	"reqd": 1,
+		// },
 		{
-			"label": __("Sucursal"),
-			"fieldname": "sucursal",
+			"label": __("Prueba"),
+			"fieldname": "prueba",
 			"fieldtype": "Link",
-			"options": "Empresa",
+			"options": "Prueba",
 			"reqd": 1,
-		},
-		{
-			"label": __("Nombre Sucursal"),
-			"fieldname": "nombre_sucursal",
-			"fieldtype": "Read Only",
 		},
 		{
 			"label": __("Tipo de Consulta"),
@@ -42,5 +44,15 @@ frappe.query_reports["Resumen de Ventas"] = {
 			"fieldtype": "Link",
 			"options": "Institucion",
 		},
-	]
+	],
+	formatter: function (row, cell, value, columnDef, dataContext, default_formatter) {
+		value = default_formatter(row, cell, value, columnDef, dataContext);
+		
+		if (cell == 1) {
+			let dt = dataContext['Documento'].split("-")[0] == "CLP" ? "Consulta Privada" : "Consulta Seguro" ;
+			value = `<a class="grey" target="_blank" href="#Form/${dt}/${dataContext['Documento']}">${dataContext['Documento']}</a>`;
+		}
+
+		return value;
+	}
 }

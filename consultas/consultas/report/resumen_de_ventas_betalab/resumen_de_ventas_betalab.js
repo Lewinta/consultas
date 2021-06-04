@@ -2,7 +2,7 @@
 // For license information, please see license.txt
 /* eslint-disable */
 
-frappe.query_reports["Resumen de Ventas"] = {
+frappe.query_reports["Resumen de Ventas Betalab"] = {
 	"filters": [
 		{
 			"label": __("From Date"),
@@ -18,18 +18,13 @@ frappe.query_reports["Resumen de Ventas"] = {
 			"default": frappe.datetime.year_end(),
 			"reqd": 1,
 		},
-		{
-			"label": __("Sucursal"),
-			"fieldname": "sucursal",
-			"fieldtype": "Link",
-			"options": "Empresa",
-			"reqd": 1,
-		},
-		{
-			"label": __("Nombre Sucursal"),
-			"fieldname": "nombre_sucursal",
-			"fieldtype": "Read Only",
-		},
+		// {
+		// 	"label": __("Sucursal"),
+		// 	"fieldname": "sucursal",
+		// 	"fieldtype": "Link",
+		// 	"options": "Empresa",
+		// 	"reqd": 1,
+		// },
 		{
 			"label": __("Tipo de Consulta"),
 			"fieldname": "tipo_de_consulta",

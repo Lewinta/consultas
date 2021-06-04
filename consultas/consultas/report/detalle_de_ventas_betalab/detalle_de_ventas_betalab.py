@@ -10,14 +10,12 @@ def execute(filters=None):
 
 def get_columns():
 	columns = [
-		"Prueba:Link/Prueba:150",
-		"Nombre:Data:200",
-		"Cantidad:Int:100",
-		"Monto:Currency:120",
-		"Total:Currency:120",
-		"Promedio:Currency:100",
-		"% Cant.:Data:90",
-		"% Total:Data:90",
+		"Documento:Data:120",
+		"Tipo:Data:120",
+		"Fecha:Date:100",
+		"Sucursal:Data:220",
+		"Paciente:Data:200",
+		"Precio:Currency:120",
 	]
 
 	return columns
@@ -29,8 +27,11 @@ def get_conditions(filters):
 	
 	if filters.get("tipo_de_consulta"):
 		conditions.append("v.tipo_de_consulta = '{}'".format(filters.get("tipo_de_consulta")))
-	if filters.get("sucursal"):
-		conditions.append("v.sucursal = '{}'".format(filters.get("sucursal")))	
+	# if filters.get("sucursal"):
+	conditions.append("v.sucursal  in ('EMP-000006', 'EMP-000014', 'EMP-000012', 'EMP-000018', 'EMP-000003')")
+	
+	if filters.get("prueba"):
+		conditions.append("v.prueba = '{}'".format(filters.get("prueba")))	
 	if filters.get("from_date"):
 		conditions.append("v.fecha >= '{}'".format(filters.get("from_date")))
 	if filters.get("to_date"):
@@ -43,39 +44,22 @@ def get_conditions(filters):
 def get_data(filters):
 	conditions = get_conditions(filters)
 	results = []
-	data = frappe.db.sql("""
+	return frappe.db.sql("""
 		SELECT 
-			v.prueba, 
-			v.prueba_nombre,
-			v.monto,
-			SUM(1) as qty, 
-			SUM(v.monto) as total_prueba
+			v.parent, 
+			v.tipo_de_consulta,
+			v.fecha,
+			v.sucursal_nombre,
+			v.paciente,
+			v.monto
 		FROM 
 			`viewVentas Por Prueba` v
 		WHERE 
 			{conditions}
 		GROUP BY 
-			v.prueba
+			v.parent
 		ORDER BY 
-			qty desc
-		""".format(conditions=conditions), debug=True, as_dict=True)
+			v.fecha
+		""".format(conditions=conditions), debug=True)
 
-	grand_total = sum([x.total_prueba for x in data])
-	grand_qty = sum([x.qty for x in data])
-
-	for row in data:
-		promedio = flt(row.total_prueba / row.qty, 2)
-		results.append(
-			(
-				row.prueba,
-				row.prueba_nombre,
-				row.qty,
-				row.monto, 
-				row.total_prueba,
-				promedio,
-				"{}%".format(flt(row.qty / grand_qty * 100, 2) if grand_qty else .000),
-				"{}%".format(flt(row.total_prueba / grand_total * 100, 2) if grand_total else .000)
-			)
-		)
-
-	return results
+	

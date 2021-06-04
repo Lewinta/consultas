@@ -278,6 +278,19 @@ frappe.ui.form.on('Resultado', {
             }});
         }
 
+        var otros_urianalisis = function(){
+            frappe.call({"method": "get_otros_uroanalisis", "doc": frm.doc, callback:function(response){
+                if(response.message){
+                    refresh_field("otros_uroanalisis")
+                    set_events()
+                    frm.refresh()
+                    frappe.show_alert("Otros Uroanalisis Actualizado!",5);
+                    frm.dirty()
+                }
+
+            }});
+        }
+
         var coprologia = function(){
             frappe.call({"method": "get_coprologia", "doc": frm.doc, callback:function(response){
                 if(response.message){
@@ -325,6 +338,7 @@ frappe.ui.form.on('Resultado', {
         frm.add_custom_button("Inmunodiagnosticos",inmunodiagnosticos,"Actualizar" )
         frm.add_custom_button("Hormonas",hormonas,"Actualizar" )
         frm.add_custom_button("Tipificacion",tipificacion,"Actualizar" )
+        frm.add_custom_button("Otros Urianalisis",otros_urianalisis,"Actualizar" )
         frm.add_custom_button("Urianalisis",urianalisis,"Actualizar" )
         frm.add_custom_button("Coprologia",coprologia,"Actualizar" )
         frm.add_custom_button("Espermatograma",espermatograma,"Actualizar" )

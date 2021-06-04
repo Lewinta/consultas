@@ -42,7 +42,7 @@
    "reqd": 1, 
    "search_index": 0, 
    "set_only_once": 0, 
-   "unique": 1
+   "unique": 0
   }, 
   {
    "allow_bulk_edit": 0, 
@@ -245,7 +245,7 @@
    "label": "Metodo", 
    "length": 0, 
    "no_copy": 0, 
-   "options": "QLM\nFLOCULACION\nGRUPO / FACTOR RH\nINMUNOTURBIDIMETRIA\nELISA\nEIA\nCLIA\nRIA\nQEIA\nFRECUENCIA\nAFF-COOL\nIFA\nIGG\nIGM\nMANTOUX\nELFA\nCROMATOGRAFIA\n-", 
+   "options": "QLM\nFLOCULACION\nGRUPO / FACTOR RH\nINMUNOTURBIDIMETRIA\nELISA\nEIA\nCLIA\nRIA\nQEIA\nFRECUENCIA\nAFF-COOL\nIFA\nIGG\nIGM\nMANTOUX\nELFA\nCROMATOGRAFIA\nSARS-CoV RNA PCR\n-", 
    "permlevel": 0, 
    "precision": "", 
    "print_hide": 0, 
@@ -277,7 +277,7 @@
    "label": "Grupo", 
    "length": 0, 
    "no_copy": 0, 
-   "options": "QUIMICA\nSEROLOGIA\nINMUNODIAGNOSTICOS\nHORMONAS\nESPECIALES\nCOAGULACION\nMICROBIOLOGIA", 
+   "options": "QUIMICA\nSEROLOGIA\nINMUNODIAGNOSTICOS\nHORMONAS\nESPECIALES\nCOAGULACION\nMICROBIOLOGIA\nOTROS UROANALISIS", 
    "permlevel": 0, 
    "precision": "", 
    "print_hide": 0, 
@@ -363,7 +363,7 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2020-08-08 15:13:29.813141", 
+ "modified": "2021-05-26 20:10:18.951218", 
  "modified_by": "Administrator", 
  "module": "Consultas", 
  "name": "Indice Prueba", 

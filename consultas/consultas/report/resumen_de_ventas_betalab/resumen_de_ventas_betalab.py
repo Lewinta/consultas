@@ -29,8 +29,9 @@ def get_conditions(filters):
 	
 	if filters.get("tipo_de_consulta"):
 		conditions.append("v.tipo_de_consulta = '{}'".format(filters.get("tipo_de_consulta")))
-	if filters.get("sucursal"):
-		conditions.append("v.sucursal = '{}'".format(filters.get("sucursal")))	
+	# if filters.get("sucursal"):
+	conditions.append("v.sucursal  in ('EMP-000006', 'EMP-000014', 'EMP-000012', 'EMP-000018', 'EMP-000003')")
+	
 	if filters.get("from_date"):
 		conditions.append("v.fecha >= '{}'".format(filters.get("from_date")))
 	if filters.get("to_date"):
