@@ -28,7 +28,7 @@ def get_conditions(filters):
 	if filters.get("tipo_de_consulta"):
 		conditions.append("v.tipo_de_consulta = '{}'".format(filters.get("tipo_de_consulta")))
 	# if filters.get("sucursal"):
-	conditions.append("v.sucursal  in ('EMP-000006', 'EMP-000014', 'EMP-000012', 'EMP-000018', 'EMP-000003')")
+	# conditions.append("v.sucursal  in ('EMP-000006', 'EMP-000014', 'EMP-000012', 'EMP-000018', 'EMP-000003')")
 	
 	if filters.get("prueba"):
 		conditions.append("v.prueba = '{}'".format(filters.get("prueba")))	

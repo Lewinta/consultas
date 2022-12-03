@@ -15,12 +15,30 @@ def get_results(filters):
 		}, as_dict=True, debug=True)
 
 @frappe.whitelist(allow_guest=True)
-def get_institutions():
-	return frappe.db.sql("""SELECT name
-		FROM `tabInstitucion`
-		WHERE pertenece_a_la_pagina = 1
-		ORDER BY name""", debug=False
-	)
+def get_institutions(medico):
+	if not medico:
+		return frappe.db.sql("""SELECT name
+			FROM `tabInstitucion`
+			WHERE pertenece_a_la_pagina = 1
+			ORDER BY name""", debug=False
+		)
+	else:
+		return frappe.db.sql("""
+			SELECT
+				distinct(`tabResultado`.institucion) as name
+			FROM
+				`tabResultado`
+			JOIN
+				`tabInstitucion`
+			ON
+				`tabResultado`.institucion = `tabInstitucion`.name
+			WHERE
+				`tabInstitucion`.pertenece_a_la_pagina = 1
+			AND
+				`tabResultado`.medico = %s
+			ORDER BY name""", medico, debug=False
+		)
+
 
 @frappe.whitelist(allow_guest=True)
 def get_print_url(name, print_format="Resultados Timbrados"):
@@ -38,6 +56,15 @@ def get_team(email):
 	return frappe.db.get_value("Institucion", {
 		"correo_electronico": email
 	})
+	
+
+@frappe.whitelist(allow_guest=True)
+def get_single_result(key):
+	name = frappe.db.exists("Resultado", {"key":key, "docstatus": 1})
+	if not name:
+		return False
+	
+	return frappe.get_value("Resultado", name, "print_url")
 	
 def get_conditions(filters):
 	query = []

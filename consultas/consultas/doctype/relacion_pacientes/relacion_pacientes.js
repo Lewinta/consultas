@@ -3,25 +3,31 @@
 
 frappe.ui.form.on('Relacion Pacientes', {
 	refresh: function(frm) {
-	frm.fields_dict.ordenar_por.df.options=[
-		{
-        	"value": "fecha",
-        	"label": "Fecha"
-        },
-        {
-        	"value": "name",
-        	"label": "Documento"
-        },
-        {
-        	"value": "paciente",
-        	"label": "Nombre"
-        },
-        {
-        	"value": "ars_nombre",
-        	"label": "ARS"
-        },
-	]
-	frm.refresh_fields("ordernar_por")
+		const cond = frappe.user.has_role("Reportero") && !frappe.user.has_role("Gerente");
+		const fields = ["total_asegurados", "total_privados", "total_diferencias"]
+		$.map(fields, field => {
+			frm.set_df_property(field, "read_only", cond)
+		})
+			
+		frm.fields_dict.ordenar_por.df.options=[
+			{
+				"value": "fecha",
+				"label": "Fecha"
+			},
+			{
+				"value": "name",
+				"label": "Documento"
+			},
+			{
+				"value": "paciente",
+				"label": "Nombre"
+			},
+			{
+				"value": "ars_nombre",
+				"label": "ARS"
+			},
+		]
+		frm.refresh_fields("ordernar_por")
 
 	},
 	ordernar_por: function (frm){

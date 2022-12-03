@@ -23,7 +23,7 @@ frappe.query_reports["Resumen de Ventas"] = {
 			"fieldname": "sucursal",
 			"fieldtype": "Link",
 			"options": "Empresa",
-			"reqd": 1,
+			// "reqd": 1,
 		},
 		{
 			"label": __("Nombre Sucursal"),

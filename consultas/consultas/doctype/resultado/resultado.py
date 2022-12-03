@@ -4,6 +4,7 @@
 
 from __future__ import unicode_literals
 import frappe
+import hashlib
 from frappe.model.document import Document
 from consultas.consultas.api import get_rango_por_edad
 
@@ -81,7 +82,8 @@ class Resultado(Document):
 		consulta = frappe.get_doc(self.consulta_tipo,self.consulta)
 		if(consulta):
 			consulta.resultado = name
-
+		
+	
 	def get_quimica(self):
 
 		temp = self.indices_pruebas if hasattr(self,'indices_pruebas') else 0.00 
@@ -200,7 +202,9 @@ class Resultado(Document):
 			SELECT 
 				C.prueba AS name, I.prueba_nombre AS prueba, I.uds, I.metodo, I.rango_referencia AS rango_ref
 			FROM 
-				`tabIndice Prueba` I JOIN `{0}` C 
+				`tabIndice Prueba` I 
+			JOIN 
+				`{0}` C 
 			ON 
 				I.prueba = C.prueba 
 			WHERE 
@@ -212,6 +216,7 @@ class Resultado(Document):
 			"""
 			.format(self.get_consult_table(), self.consulta),
 		as_dict=True)
+		
 		self.inmunodiagnosticos = []
 		self.test_inmunodiagnosticos = 1 if result else 0 
 		for prueba in result:
@@ -272,6 +277,10 @@ class Resultado(Document):
 				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba":"FACTOR REUMATOIDE", "metodo": "INMUNOTURBID.", "rango_ref": "< 14.0", "uds": "UI/mL"})
 				continue 
 			
+			if prueba.name == "PRB-000000368":
+				self.test_otros_cultivos = 1
+				continue
+
 			if prueba.name == "PRB-000000322":
 				self.append("inmunodiagnosticos", {"prueba_name": prueba.prueba_name, "prueba": "CD4, CD8, CD3, COOPERADOR/SUPRESOR", "metodo": " ", "rango_ref": "      ", "uds": " "})
 				self.append("inmunodiagnosticos", {"prueba_name": prueba.prueba_name, "prueba": "CONTEO TOTAL LEUCOCITOS", "metodo": " ", "rango_ref": "      ", "uds": " "})
@@ -286,7 +295,7 @@ class Resultado(Document):
 				continue
 			
 			self.append("inmunodiagnosticos",{"prueba":prueba.prueba,"metodo":prueba.metodo,"rango_ref":prueba.rango_ref,"uds":prueba.uds})
-			
+
 			if temp:
 				for row in self.inmunodiagnosticos:
 					for tmp in temp:
@@ -449,21 +458,37 @@ class Resultado(Document):
 			# self.append("antibiogramas", {"valor": "VACOMYCIN", "resultado": "", "interpretacion": "-" })
 			# self.append("antibiogramas", {"valor": "CEFOXITIN", "resultado": "", "interpretacion": "-" })
 
-			self.append("antibiogramas", {"valor": "AMIKACIN", "resultado": "", "interpretacion": "-"})
-			self.append("antibiogramas", {"valor": "AMPILICIN", "resultado": "", "interpretacion": "-"})
-			self.append("antibiogramas", {"valor": "CEFAZOLIN", "resultado": "", "interpretacion": "-"})
-			self.append("antibiogramas", {"valor": "CEFEPIME", "resultado": "", "interpretacion": "-"})
+			# self.append("antibiogramas", {"valor": "AMIKACIN", "resultado": "", "interpretacion": "-"})
+			# self.append("antibiogramas", {"valor": "AMPILICIN", "resultado": "", "interpretacion": "-"})
+			# self.append("antibiogramas", {"valor": "CEFAZOLIN", "resultado": "", "interpretacion": "-"})
+			# self.append("antibiogramas", {"valor": "CEFEPIME", "resultado": "", "interpretacion": "-"})
+			# self.append("antibiogramas", {"valor": "CEFTAZIDIME", "resultado": "", "interpretacion": "-"})
+			# self.append("antibiogramas", {"valor": "CIPROFLOXACIN", "resultado": "", "interpretacion": "-"})
+			# self.append("antibiogramas", {"valor": "CEFTRIAXONE", "resultado": "", "interpretacion": "-"})
+			# self.append("antibiogramas", {"valor": "GENTAMICIN", "resultado": "", "interpretacion": "-"})
+			# self.append("antibiogramas", {"valor": "IMIPENEM", "resultado": "", "interpretacion": "-"})
+			# self.append("antibiogramas", {"valor": "NITROFURANTOIN", "resultado": "", "interpretacion": "-"})
+			# self.append("antibiogramas", {"valor": "LEVOFLOXACIN", "resultado": "", "interpretacion": "-"})
+			# self.append("antibiogramas", {"valor": "POPERAC", "resultado": "", "interpretacion": "-"})
+			# self.append("antibiogramas", {"valor": "TOBRAMYCIN", "resultado": "", "interpretacion": "-"})
+			# self.append("antibiogramas", {"valor": "TRIMETHO", "resultado": "", "interpretacion": "-"})
+			# self.append("antibiogramas", {"valor": "ERTAPENEM", "resultado": "", "interpretacion": "-"})
+
+			self.append("antibiogramas", {"valor": "AC. NALIDIXICO", "resultado": "", "interpretacion": "-"})
+			self.append("antibiogramas", {"valor": "AMIKACINA", "resultado": "", "interpretacion": "-"})
+			self.append("antibiogramas", {"valor": "AMOXICILINA", "resultado": "", "interpretacion": "-"})
+			self.append("antibiogramas", {"valor": "AMOXICILINA /AC. CLAVULÂNICO", "resultado": "", "interpretacion": "-"})
+			self.append("antibiogramas", {"valor": "AMPICILINA", "resultado": "", "interpretacion": "-"})
+			self.append("antibiogramas", {"valor": "CEFOTAXIMA", "resultado": "", "interpretacion": "-"})
 			self.append("antibiogramas", {"valor": "CEFTAZIDIME", "resultado": "", "interpretacion": "-"})
-			self.append("antibiogramas", {"valor": "CIPROFLOXACIN", "resultado": "", "interpretacion": "-"})
-			self.append("antibiogramas", {"valor": "CEFTRIAXONE", "resultado": "", "interpretacion": "-"})
-			self.append("antibiogramas", {"valor": "GENTAMICIN", "resultado": "", "interpretacion": "-"})
+			self.append("antibiogramas", {"valor": "CIPROFIOXACINA", "resultado": "", "interpretacion": "-"})
+			self.append("antibiogramas", {"valor": "FOSFOMICINA", "resultado": "", "interpretacion": "-"})
+			self.append("antibiogramas", {"valor": "GENTAMICINA", "resultado": "", "interpretacion": "-"})
 			self.append("antibiogramas", {"valor": "IMIPENEM", "resultado": "", "interpretacion": "-"})
-			self.append("antibiogramas", {"valor": "NITROFURANTOIN", "resultado": "", "interpretacion": "-"})
-			self.append("antibiogramas", {"valor": "LEVOFLOXACIN", "resultado": "", "interpretacion": "-"})
-			self.append("antibiogramas", {"valor": "POPERAC", "resultado": "", "interpretacion": "-"})
-			self.append("antibiogramas", {"valor": "TOBRAMYCIN", "resultado": "", "interpretacion": "-"})
-			self.append("antibiogramas", {"valor": "TRIMETHO", "resultado": "", "interpretacion": "-"})
-			self.append("antibiogramas", {"valor": "ERTAPENEM", "resultado": "", "interpretacion": "-"})
+			self.append("antibiogramas", {"valor": "LEVOFLOXACINA", "resultado": "", "interpretacion": "-"})
+			self.append("antibiogramas", {"valor": "NORFLOXACINA", "resultado": "", "interpretacion": "-"})
+			self.append("antibiogramas", {"valor": "OFLOXACINA", "resultado": "", "interpretacion": "-"})
+			self.append("antibiogramas", {"valor": "SULFAMETOXAZOLE/TRIMETROPINA", "resultado": "", "interpretacion": "-"})
 
 
 		if temp and result:
@@ -540,14 +565,15 @@ class Resultado(Document):
 					return True
 			return False
 		temp = self.indices_hematologicos if hasattr(self,'indices_hematologicos') else 0.00 
-		result = frappe.db.sql("""SELECT prueba from `{0}` WHERE parent='{1}' AND prueba in ('PRB-000000195', 'PRB-000000310', 'PRB-000000205', 'PRB-000000207', 'PRB-000000198') """  
+		result = frappe.db.sql("""SELECT prueba from `{0}` WHERE parent='{1}' AND prueba in ('PRB-000000195', 'PRB-000000310', 'PRB-000000205', 'PRB-000000207', 'PRB-000000198', 'PRB-000000374') """  
 			.format(self.get_consult_table(), self.consulta), as_dict=True)
 		result = [n.prueba for n in result]
 
 		self.indices_hematologicos = []
 		self.test_hematologico = 1 if 'PRB-000000195' in result else 0
-		self.test_otros_hematologico = 1 if compare_lists(['PRB-000000310', 'PRB-000000205', 'PRB-000000198', 'PRB-000000207'], result)  else 0
- 
+		self.test_extendido_periferico = 1 if 'PRB-000000374' in result else 0
+		self.test_otros_hematologico = 1 if compare_lists(['PRB-000000310', 'PRB-000000205', 'PRB-000000198', 'PRB-000000207', 'PRB-000000374'], result)  else 0
+		frappe.errprint(result)
 		if 'PRB-000000195' in result:
 			for indice in frappe.get_list("Indice Hematologico", {"disponible": 1,"recuento_diferencial":0,"otros_hematologia":0}, ["name", "uds","rango_referencia"],order_by="creation ASC", limit_page_length=0):
 				

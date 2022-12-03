@@ -125,6 +125,7 @@ frappe.ui.form.on('Paciente', {
 			var onsubmit = function(values){
 				
 				var days = frappe.datetime.get_diff(frappe.datetime.get_today(), values.fecha_nacimiento)
+				frm.set_value("fecha_de_nacimiento", values.fecha_nacimiento)
 				frm.set_value("edad",parseInt(days/365))
 			}
  

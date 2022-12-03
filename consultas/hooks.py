@@ -32,9 +32,6 @@ app_include_js = [
 #        "assets/css/module.min.css"
 #]
 
-
-
-
 # Includes in <head>
 # ------------------
 
@@ -50,6 +47,16 @@ doctype_js = {
 	"Customer" : "public/js/customer.js"
 }
 
+# Fixtures
+# ----------
+fixtures = [
+	{
+		"doctype": "Print Format", 
+		"filters": {
+			"name": ["in", ["Resultados", "Resultados Timbrados"]]
+		}
+	}
+]
 # Home Pages
 # ----------
 

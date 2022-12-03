@@ -1,7 +1,7 @@
 {
  "allow_copy": 0, 
  "allow_guest_to_view": 0, 
- "allow_import": 0, 
+ "allow_import": 1, 
  "allow_rename": 1, 
  "autoname": "field:nombre", 
  "beta": 0, 
@@ -269,7 +269,7 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2020-09-16 00:35:43.802559", 
+ "modified": "2022-07-07 15:01:27.068386", 
  "modified_by": "Administrator", 
  "module": "Consultas", 
  "name": "Indice Urinario", 
