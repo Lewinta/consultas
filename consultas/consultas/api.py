@@ -1,6 +1,8 @@
 import frappe, json
 
 from frappe.utils import get_url
+from frappe.utils.pdf import get_pdf
+from frappe import _
 
 @frappe.whitelist(allow_guest=True)
 def get_results(filters):
@@ -63,8 +65,22 @@ def get_single_result(key):
 	name = frappe.db.exists("Resultado", {"key":key, "docstatus": 1})
 	if not name:
 		return False
+	url = "https://app.laboratoriobetalab.com/api/method/consultas.consultas.api.download_result_pdf?key_code={}".format(key)
+	return url
+
+@frappe.whitelist(allow_guest=True)
+def download_result_pdf(key_code, format="Resultados Timbrados", no_letterhead=0):
+	doctype = "Resultado"
 	
-	return frappe.get_value("Resultado", name, "print_url")
+	name = frappe.db.exists(doctype, {"key": key_code})
+	if not name:
+		frappe.local.response["type"] = "redirect"
+		frappe.local.response["location"] = "/custom_404.html?key_code={}".format(key_code[0:-6])
+	else:	
+		html = frappe.get_print(doctype, name, format, no_letterhead=no_letterhead)
+		frappe.local.response.filename = "{name}.pdf".format(name=name.replace(" ", "-").replace("/", "-"))
+		frappe.local.response.filecontent = get_pdf(html)
+		frappe.local.response.type = "download"
 	
 def get_conditions(filters):
 	query = []

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title></title>
+</head>
+<body>
+	<div class="error-page">
+	<img class="img-404" src="/files/404.png" />
+	<div>
+		<h2 class="mb-1 mt-4">
+			There's nothing here
+		</h2>
+		<div class="text-muted error-text">
+			The page you are looking for has gone missing.<br><br>
+			<input type="button" value="Back to Home" id="back-btn" onclick="back_home()"/>
+		</div>
+	</div>
+</div>
+<script>
+	var getUrlParameter = function getUrlParameter(sParam) {
+			var sPageURL = decodeURIComponent(window.location.search.substring(1)), sURLVariables = sPageURL.split('&'), sParameterName, i;
+			for (i = 0; i < sURLVariables.length; i++) { 
+				sParameterName = sURLVariables[i].split('='); 
+				if (sParameterName[0] === sParam) { 
+					return sParameterName[1] === undefined ? true : sParameterName[1]; 
+				} 
+			} 
+		};
+	function back_home(){
+		let btn = document.getElementById('back-btn');
+		const url_key_code = getUrlParameter('key_code');
+		btn.addEventListener('click', () => {
+			window.location.replace(`https://laboratoriobetalab.com/validate-result?key_code=${url_key_code}`);
+		});
+	}
+	
+</script>
+</body>
+</html>

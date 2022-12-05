@@ -1,0 +1,27 @@
+img{
+    width: 30%;
+}
+.error-page {
+    text-align: center;
+    margin-top: 5%;
+    font-family: "Helvetica"
+}
+.error-text {
+    color: #dd916f;
+}
+
+#back-btn {
+    padding: 1%;
+    width: 15%;
+    background-color: #2490ef;
+    color: white;
+    font-family: "Helvetica";
+    font-size: 15px;
+    border: none;
+    cursor: pointer;
+    min-width: 150px;
+}
+#back-btn:active {
+    transform: scale(0.98);
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
+}
