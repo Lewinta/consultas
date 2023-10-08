@@ -330,6 +330,19 @@ frappe.ui.form.on('Resultado', {
             }});
         }
 
+        var especiales = function(){
+            frappe.call({"method": "get_especiales", "doc": frm.doc, callback:function(response){
+                if(response.message){
+                    frm.refresh()
+                    frm.refresh_fields("test_especiales")
+                    frm.dirty()
+                    frappe.show_alert("Especiales Actualizado!",5);
+                    frm.dirty()
+                }
+            
+            }});
+        }
+
         frm.add_custom_button("Informacion Personal",personal_info,"Actualizar" )
         frm.add_custom_button("Hematologia",hematologia,"Actualizar" )
         frm.add_custom_button("Microbiologia",microbiologia,"Actualizar" )
@@ -343,6 +356,7 @@ frappe.ui.form.on('Resultado', {
         frm.add_custom_button("Coprologia",coprologia,"Actualizar" )
         frm.add_custom_button("Espermatograma",espermatograma,"Actualizar" )
         frm.add_custom_button("Anexos",anexos,"Actualizar" )
+        frm.add_custom_button("Especiales",especiales,"Actualizar" )
     }
 });
 frappe.ui.form.on("Resultado Quimica", {
@@ -563,7 +577,7 @@ function clean_str(s) {
     // Let's asterix
     temp = replace_all(temp, "*","");
 
-    console.log("Return temp: "+temp);
+    // console.log("Return temp: "+temp);
 
     return temp
 }

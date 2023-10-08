@@ -58,7 +58,7 @@ class Resultado(Document):
 	# 	cp.db_update()
 
 	# def on_cancel(self):
-		self.remove_result_to_consult()
+		# self.remove_result_to_consult()
 
 
 	# def on_trash(self):
@@ -232,7 +232,7 @@ class Resultado(Document):
 				continue 
 
 			if prueba.name == "PRB-000000059":
-				self.append("inmunodiagnosticos",prueba)
+				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba": "TIEMPO DE PROTOMBINA (PT) +  INR", "metodo": "-", "rango_ref": "11 - 17", "uds": "SEGUNDOS"})	
 				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba": " ", "metodo": "CONTROL", "rango_ref": "          ", "uds": "SEGUNDOS"})	
 				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba": " ", "metodo": "INR"    , "rango_ref": "0.9 - 1.2" , "uds": "SEGUNDOS"})	
 				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba": " ", "metodo": "%"      , "rango_ref": "70 - 120"," uds":"%"})	
@@ -245,7 +245,7 @@ class Resultado(Document):
 				continue
 
 			if prueba.name == "PRB-000000060":
-				self.append("inmunodiagnosticos",prueba)
+				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba":"TIEMPO DE TROMBOPLASTINA PARCIAL (PTT)", "metodo": "-", "rango_ref": "22 - 30", "uds": "SEGUNDOS"})
 				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba":" ", "metodo": "CONTROL", "rango_ref": "          ", "uds": "SEGUNDOS"})
 				continue
 
@@ -256,6 +256,13 @@ class Resultado(Document):
 				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba":"PARATYPHI B(H)", "metodo": " ", "rango_ref": "          ", "uds": " "})	
 				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba":"BRUCELLAS ABORTUS", "metodo": " ", "rango_ref": "          ", "uds": " "})	
 				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba":"PROTEUS O-X-19", "metodo": " ", "rango_ref": "          ", "uds": " "})
+				continue 
+
+			if prueba.name == "PRB-000000287":
+				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba":"HEPATITIS C RNA", "metodo": " ", "rango_ref": "ANEXOS", "uds": "UI/mL"})	
+				self.append("inmunodiagnosticos",{"prueba_name": prueba.prueba_name, "prueba":"HEPATITIS C RNA", "metodo": " ", "rango_ref": "ANEXOS", "uds": "Log10"})	
+				self.test_prb_000000287 = 1
+				self.test_anexos==1
 				continue 
 
 			if prueba.name == "PRB-000000299":
@@ -292,6 +299,19 @@ class Resultado(Document):
 				self.append("inmunodiagnosticos", {"prueba_name": prueba.prueba_name, "prueba": "RELACION CD4/CD8", "metodo": " ", "rango_ref": "      ", "uds": " "})
 				self.append("inmunodiagnosticos", {"prueba_name": prueba.prueba_name, "prueba": "RELACION CD4/CD3", "metodo": " ", "rango_ref": "      ", "uds": " "})
 				self.append("inmunodiagnosticos", {"prueba_name": prueba.prueba_name, "prueba": "RELACION CD8/CD3", "metodo": " ", "rango_ref": "      ", "uds": " "})
+				continue
+
+			if prueba.name == "PRB-000000386":
+				self.append("inmunodiagnosticos", {"prueba_name": prueba.prueba_name, "prueba": "ATUN", "metodo": "InmunoCAP", "rango_ref": "< 0.10", "uds": "kU/L"})
+				self.append("inmunodiagnosticos", {"prueba_name": prueba.prueba_name, "prueba": "BACALAO", "metodo": "InmunoCAP", "rango_ref": "< 0.10", "uds": "kU/L"})
+				self.append("inmunodiagnosticos", {"prueba_name": prueba.prueba_name, "prueba": "CAMARONES", "metodo": "InmunoCAP", "rango_ref": "< 0.10", "uds": "kU/L"})
+				self.append("inmunodiagnosticos", {"prueba_name": prueba.prueba_name, "prueba": "CANGREJO", "metodo": "InmunoCAP", "rango_ref": "< 0.10", "uds": "kU/L"})
+				self.append("inmunodiagnosticos", {"prueba_name": prueba.prueba_name, "prueba": "LANGOSTA", "metodo": "InmunoCAP", "rango_ref": "< 0.10", "uds": "kU/L"})
+				self.append("inmunodiagnosticos", {"prueba_name": prueba.prueba_name, "prueba": "MEJILLON", "metodo": "InmunoCAP", "rango_ref": "< 0.10", "uds": "kU/L"})
+				self.append("inmunodiagnosticos", {"prueba_name": prueba.prueba_name, "prueba": "PULPO", "metodo": "InmunoCAP", "rango_ref": "< 0.10", "uds": "kU/L"})
+				self.append("inmunodiagnosticos", {"prueba_name": prueba.prueba_name, "prueba": "SALMON", "metodo": "InmunoCAP", "rango_ref": "< 0.10", "uds": "kU/L"})
+				self.test_prb_000000386 = 1
+				self.test_anexos==1
 				continue
 			
 			self.append("inmunodiagnosticos",{"prueba":prueba.prueba,"metodo":prueba.metodo,"rango_ref":prueba.rango_ref,"uds":prueba.uds})
@@ -809,6 +829,7 @@ class Resultado(Document):
 						row.examen_fisicoquimico = tmp.examen_fisicoquimico
 		
 		return True
+	
 	def get_anexos(self):
 		self_dict = self.as_dict()
 		consulta = frappe.get_doc(self.consulta_tipo, self.consulta)
@@ -829,6 +850,12 @@ class Resultado(Document):
 			# No se le reporta Anexos a la TSH si el paciente es hombre
 			# if prueba.prueba == "PRB-000000065" and self.sexo == "MASCULINO":
 				# continue
+			
+			self.quimica_observaciones =  ''
+			
+			if prueba.prueba == "PRB-000000287":
+				show_anexos = 1
+			
 			if anexos and anexos[0].es_una_tabla:
 				# frappe.errprint(anexos)
 				show_anexos = 1
@@ -879,6 +906,26 @@ class Resultado(Document):
 		tipo_cons = "Consulta Prueba Privada" if self.consulta_tipo == "Consulta Privada" else "Consulta Prueba"
 		return not not frappe.get_value(tipo_cons, {'parent':self.consulta, 'prueba':'PRB-000000229'})
 
+	def get_especiales(self):
+		result = frappe.db.sql("""SELECT I.prueba_nombre AS prueba, I.uds, I.metodo, I.rango_referencia AS rango_ref
+			FROM 
+				`tabIndice Prueba` I JOIN `{0}` C 
+			ON 
+				I.prueba = C.prueba 
+			WHERE 
+				C.parent = '{1}' AND I.grupo  = 'ESPECIALES'
+			ORDER BY C.idx"""
+			.format(self.get_consult_table(), self.consulta),
+		as_dict=True)
+
+		self.test_especiales = 1 if result else 0
+
+		for prueba in result:
+			self.resultados_especiales = """
+				<div><br></div><div><b>Biología Molecular</b></div><div><br></div><div><b>Factor V Leiden</b>. .c. 1601G&gt;A. .mutación. ...<b>[Colocar Resultado]</b></div><div>Muestra: Sangre completa colectada con EDIA</div><div>Metodología: PCR IR</div><div><b><br></b></div><div><b>Nota:</b></div><div>La variante del factor V Leiden (p.Arg534GIn) es un factor de riesgo leve de tromboembolismo venoso. Aunque la variante del factor V de Leiden está ausente, el individuo puede tener otros factores de riesgo genéticos y ambientales de tromboembolismo venoso.</div><div>Discrepancias entre el ensayo de resistencia a la proteína C activada y la mutación del Factor V Leiden c.1601 G&gt;A, puede observarse en pacientes que han recibido trasplantes alogénicos de células madre o trasplantes de hígado.</div>
+			"""
+		return True
+
 	def get_table_items(self):
 		self.refresh_personal_info()
 		self.get_quimica()
@@ -894,3 +941,4 @@ class Resultado(Document):
 		self.get_microbiologia()
 		self.get_espermatograma()
 		self.get_others()
+		self.get_especiales()

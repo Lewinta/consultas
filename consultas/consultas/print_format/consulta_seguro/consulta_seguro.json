@@ -1,0 +1,23 @@
+{
+ "align_labels_right": 0, 
+ "creation": "2023-03-22 17:31:36.069503", 
+ "custom_format": 1, 
+ "disabled": 0, 
+ "doc_type": "Consulta Seguro", 
+ "docstatus": 0, 
+ "doctype": "Print Format", 
+ "font": "Default", 
+ "format_data": "[{\"fieldname\": \"print_heading_template\", \"fieldtype\": \"Custom HTML\", \"options\": \"<div class=\\\"print-heading\\\">\\t\\t\\t\\t<h2>Consulta Seguro<br><small>{{ doc.name }}</small>\\t\\t\\t\\t</h2></div>\"}, {\"fieldtype\": \"Section Break\", \"label\": \"\"}, {\"fieldtype\": \"Column Break\"}, {\"print_hide\": 0, \"fieldname\": \"fecha\", \"label\": \"Fecha\"}, {\"print_hide\": 0, \"fieldname\": \"responsable\", \"label\": \"Responsable\"}, {\"print_hide\": 0, \"fieldname\": \"empresa\", \"label\": \"Empresa\"}, {\"print_hide\": 0, \"fieldname\": \"paciente\", \"label\": \"Paciente\"}, {\"print_hide\": 0, \"fieldname\": \"medico\", \"label\": \"Medico\"}, {\"print_hide\": 0, \"fieldname\": \"sucursal\", \"label\": \"Sucursal\"}, {\"print_hide\": 0, \"fieldname\": \"edad\", \"label\": \"Edad\"}, {\"fieldtype\": \"Column Break\"}, {\"print_hide\": 0, \"fieldname\": \"editable\", \"label\": \"Editable\"}, {\"print_hide\": 0, \"fieldname\": \"institucion\", \"label\": \"Institucion\"}, {\"print_hide\": 0, \"fieldname\": \"ars\", \"label\": \"Ars\"}, {\"print_hide\": 0, \"fieldname\": \"ars_nombre\", \"label\": \"Ars Nombre\"}, {\"print_hide\": 0, \"fieldname\": \"nss\", \"label\": \"NSS\"}, {\"print_hide\": 0, \"fieldname\": \"sucursal_nombre\", \"label\": \"Sucursal Nombre\"}, {\"fieldtype\": \"Section Break\", \"label\": \"\"}, {\"fieldtype\": \"Column Break\"}, {\"visible_columns\": [{\"print_hide\": 0, \"fieldname\": \"prueba\", \"print_width\": \"\"}, {\"print_hide\": 0, \"fieldname\": \"prueba_nombre\", \"print_width\": \"\"}, {\"print_hide\": 0, \"fieldname\": \"reclamado\", \"print_width\": \"\"}, {\"print_hide\": 0, \"fieldname\": \"autorizado\", \"print_width\": \"\"}, {\"print_hide\": 0, \"fieldname\": \"diferencia\", \"print_width\": \"\"}], \"print_hide\": 0, \"fieldname\": \"pruebas\", \"label\": \"Pruebas\"}, {\"fieldtype\": \"Section Break\", \"label\": \"\"}, {\"fieldtype\": \"Column Break\"}, {\"print_hide\": 0, \"fieldname\": \"autorizado\", \"label\": \"Monto Autorizado\"}, {\"print_hide\": 0, \"fieldname\": \"reclamado\", \"label\": \"Monto Reclamado\"}, {\"fieldtype\": \"Column Break\"}, {\"print_hide\": 0, \"fieldname\": \"diferencia\", \"label\": \"Diferencia\"}, {\"print_hide\": 0, \"fieldname\": \"autorizacion\", \"label\": \"Autorizacion\"}, {\"print_hide\": 0, \"fieldname\": \"resultado\", \"label\": \"Resultado\"}, {\"fieldtype\": \"Section Break\", \"label\": \"Verificacion\"}, {\"fieldtype\": \"Column Break\"}, {\"print_hide\": 0, \"fieldname\": \"verificado\", \"label\": \"Verificado\"}, {\"fieldtype\": \"Column Break\"}, {\"print_hide\": 0, \"fieldname\": \"facturado\", \"label\": \"Facturado\"}, {\"fieldtype\": \"Column Break\"}, {\"print_hide\": 0, \"fieldname\": \"es_jornada\", \"label\": \"Es Jornada\"}]", 
+ "html": "{{doc.customer}}", 
+ "idx": 0, 
+ "line_breaks": 0, 
+ "modified": "2023-03-22 17:32:56.660114", 
+ "modified_by": "Administrator", 
+ "module": "Consultas", 
+ "name": "Consulta Seguro", 
+ "owner": "Administrator", 
+ "print_format_builder": 1, 
+ "print_format_type": "Server", 
+ "show_section_headings": 0, 
+ "standard": "Yes"
+}
